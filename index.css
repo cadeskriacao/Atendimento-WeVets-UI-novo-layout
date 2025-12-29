@@ -1,0 +1,58 @@
+@import "tailwindcss";
+@config "./tailwind.config.js";
+
+/* Global Styles Overrides if needed, but keeping it minimal for utility-first approach */
+:root {
+  font-family: 'Figtree', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #f3f4f6;
+  /* bg-gray-100 equivalent */
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  #printable-content,
+  #printable-content * {
+    visibility: visible;
+  }
+
+  #printable-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+    border: none;
+    background: white;
+    overflow: visible !important;
+  }
+
+  /* Hide specific elements during print */
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Show specific elements during print */
+  .print\:block {
+    display: block !important;
+  }
+
+  /* Adjust spacing for print */
+  .print\:space-y-1> :not([hidden])~ :not([hidden]) {
+    --tw-space-y-reverse: 0;
+    margin-top: calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));
+    margin-bottom: calc(0.25rem * var(--tw-space-y-reverse));
+  }
+}

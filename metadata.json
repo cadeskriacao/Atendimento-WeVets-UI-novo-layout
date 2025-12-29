@@ -1,0 +1,5 @@
+{
+  "name": "WeVets Service Portal",
+  "description": "A comprehensive veterinary service management dashboard simulating the WeVets interface. Features include pet profile management, service selection with coverage checks, a dynamic shopping cart, and scheduling workflows.",
+  "requestFramePermissions": []
+}
