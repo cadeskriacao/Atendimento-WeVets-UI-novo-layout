@@ -32,7 +32,7 @@ export const Header: React.FC<HeaderProps> = ({ onGoHome }) => {
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all border border-white/10 group"
               >
                 <Home size={18} className="group-hover:scale-110 transition-transform" />
-                <span className="text-sm font-bold tracking-wide">Início</span>
+                <span className="hidden sm:inline text-sm font-bold tracking-wide">Início</span>
               </button>
             )}
           </div>
@@ -43,17 +43,17 @@ export const Header: React.FC<HeaderProps> = ({ onGoHome }) => {
         </div>
 
         <div className="flex items-center gap-6">
-          <a href="#" className="text-white/80 font-bold text-sm hover:text-white transition-colors">Ajuda</a>
+          <a href="#" className="hidden sm:block text-white/80 font-bold text-sm hover:text-white transition-colors">Ajuda</a>
 
           <div className="relative" ref={menuRef}>
             <div
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-              className={`flex items-center gap-3 cursor-pointer p-1 rounded-full pr-4 transition-all ${isUserMenuOpen ? 'bg-white/20' : 'hover:bg-white/10'}`}
+              className={`flex items-center gap-3 cursor-pointer p-1 rounded-full pr-1 sm:pr-4 transition-all ${isUserMenuOpen ? 'bg-white/20' : 'hover:bg-white/10'}`}
             >
-              <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white border border-white/20 shadow-inner">
+              <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white border border-white/20 shadow-inner shrink-0">
                 <User size={20} />
               </div>
-              <span className="text-white font-bold text-sm tracking-wide">Dr. Veterinário</span>
+              <span className="hidden sm:block text-white font-bold text-sm tracking-wide">Dr. Veterinário</span>
               <ChevronDown size={16} className={`text-blue-200 transition-transform duration-300 ${isUserMenuOpen ? 'rotate-180' : ''}`} />
             </div>
 

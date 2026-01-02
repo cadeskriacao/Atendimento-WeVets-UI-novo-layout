@@ -80,7 +80,7 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({ children
             petId,
             tutorId,
             status: 'INITIATED',
-            currentStep: 'ANAMNESIS',
+            currentStep: 'SERVICES',
             triage: {
                 weight: '',
                 temperature: '',
@@ -186,7 +186,6 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({ children
     const canFinalize = !!attendance &&
         attendance.services.length > 0 &&
         attendance.anamnesis.mainComplaint.length > 0 &&
-        (!!attendance.triage.weight || !!attendance.anamnesis.vitals.weight) &&
         !!attendance.schedulingInfo;
 
     return (
@@ -230,11 +229,25 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({ children
                 });
             },
             startMedicalAttendance: () => {
-                if (!attendance || attendance.status !== 'SCHEDULED') return;
-                setAttendance({
-                    ...attendance,
+                if (!attendance || (attendance.status !== 'SCHEDULED' && attendance.status !== 'INITIATED')) return;
+
+                const updates: Partial<Attendance> = {
                     status: 'IN_PROGRESS',
                     updatedAt: new Date().toISOString()
+                };
+
+                // Se não houver agendamento (walk-in), usar data/hora atuais
+                if (!attendance.schedulingInfo) {
+                    updates.schedulingInfo = {
+                        date: new Date().toISOString().split('T')[0],
+                        time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                        location: 'clinic'
+                    };
+                }
+
+                setAttendance({
+                    ...attendance,
+                    ...updates
                 });
             }
         }}>

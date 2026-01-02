@@ -85,19 +85,50 @@ export const AttendanceItem: React.FC<AttendanceItemProps> = ({
                         {/* 1. Clinical Summary */}
                         <div className="space-y-3">
                             <h4 className="flex items-center gap-2 font-bold text-gray-700 text-sm uppercase tracking-wide">
-                                <Stethoscope size={16} className="text-primary-500" />
-                                Resumo Clínico
+                                <Stethoscope size={16} className={`${attendance.status === 'CANCELLED' ? 'text-gray-400' : 'text-primary-500'}`} />
+                                {attendance.status === 'CANCELLED' ? 'Motivo do Cancelamento' : 'Resumo Clínico'}
                             </h4>
-                            <div className="text-sm text-gray-600 space-y-2">
-                                {attendance.anamnesis.mainComplaint ? (
-                                    <p><span className="font-semibold text-gray-800">Queixa:</span> {attendance.anamnesis.mainComplaint}</p>
+                            <div className="text-sm text-gray-600 space-y-3">
+                                {attendance.status === 'CANCELLED' ? (
+                                    <div className="bg-red-50 border border-red-100 p-3 rounded-lg flex items-start gap-2">
+                                        <AlertCircle size={14} className="text-red-500 mt-0.5 shrink-0" />
+                                        <p className="text-red-700 font-bold">{attendance.cancellationReason || 'Motivo não informado'}</p>
+                                    </div>
                                 ) : (
-                                    <p className="text-gray-400 italic">Nenhuma queixa registrada</p>
+                                    <>
+                                        {attendance.anamnesis.mainComplaint ? (
+                                            <p><span className="font-semibold text-gray-800">Queixa:</span> {attendance.anamnesis.mainComplaint}</p>
+                                        ) : (
+                                            <p className="text-gray-400 italic">Nenhuma queixa registrada</p>
+                                        )}
+
+                                        {attendance.anamnesis.diagnosticHypothesis && (
+                                            <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg">
+                                                <span className="block font-black text-[10px] text-blue-400 uppercase tracking-widest mb-1">Hipótese Diagnóstica</span>
+                                                <p className="text-blue-900 font-bold text-xs">{attendance.anamnesis.diagnosticHypothesis}</p>
+                                            </div>
+                                        )}
+
+                                        {attendance.prescriptions.length > 0 && (
+                                            <div className="p-3 bg-purple-50 border border-purple-100 rounded-lg">
+                                                <span className="block font-black text-[10px] text-purple-400 uppercase tracking-widest mb-1">Encaminhamento</span>
+                                                <ul className="space-y-1">
+                                                    {attendance.prescriptions.map(p => (
+                                                        <li key={p.id} className="text-purple-900 text-xs font-bold flex items-center gap-2">
+                                                            <div className="w-1 h-1 bg-purple-400 rounded-full" />
+                                                            {p.name}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
+
+                                        <div className="flex gap-2 text-[10px]">
+                                            <span className="bg-gray-100 px-2 py-1 rounded text-gray-500 font-bold uppercase tracking-wide border border-gray-200">Peso: {attendance.triage.weight || '--'}kg</span>
+                                            <span className="bg-gray-100 px-2 py-1 rounded text-gray-500 font-bold uppercase tracking-wide border border-gray-200">Temp: {attendance.triage.temperature || '--'}°C</span>
+                                        </div>
+                                    </>
                                 )}
-                                <div className="flex gap-2 text-xs">
-                                    <span className="bg-gray-100 px-2 py-1 rounded text-gray-600">Peso: {attendance.triage.weight || '--'}kg</span>
-                                    <span className="bg-gray-100 px-2 py-1 rounded text-gray-600">Temp: {attendance.triage.temperature || '--'}°C</span>
-                                </div>
                             </div>
                         </div>
 

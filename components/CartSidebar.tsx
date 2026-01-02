@@ -8,12 +8,13 @@ interface CartSidebarProps {
     onUpdateQuantity: (id: string, delta: number) => void;
     onRemove: (id: string) => void;
     onAction: (action: 'schedule' | 'quote' | 'finalize' | 'cancel') => void;
-    isAttendanceMode?: boolean; // Novo prop para indicar modo de atendimento
+    isAttendanceMode?: boolean;
     isScheduled?: boolean;
     isInProgress?: boolean;
+    className?: string; // Allow overrides
 }
 
-export const CartSidebar: React.FC<CartSidebarProps> = ({ items, onUpdateQuantity, onRemove, onAction, isAttendanceMode = false, isScheduled = false, isInProgress = false }) => {
+export const CartSidebar: React.FC<CartSidebarProps> = ({ items, onUpdateQuantity, onRemove, onAction, isAttendanceMode = false, isScheduled = false, isInProgress = false, className = '' }) => {
     const totalCopay = items.reduce((sum, item) => sum + (item.copay * item.quantity), 0);
     const totalAnticipation = items.reduce((sum, item) => sum + ((item.anticipationFee || 0) * item.quantity), 0);
     const totalLimitFee = items.reduce((sum, item) => sum + ((item.limitFee || 0) * item.quantity), 0);
@@ -34,8 +35,17 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ items, onUpdateQuantit
         );
     }
 
+    // Use default class if no className provided for height, or append. 
+    // Actually, simple append is best. 
+    // But we want to remove max-h if needed. 
+    // Tailwind classes override if placed later? No, not always.
+    // Let's use `bg-white flex flex-col h-full rounded-2xl ...` and keep max-h logic as default if not overridden?
+    // Responsive Tip: The drawer needs h-full. The desktop needs max-h.
+    // Let's just make it h-full and let the container decide?
+    // The previous code had: `max-h-[calc(100vh-140px)]`.
+
     return (
-        <div className={`bg-white flex flex-col h-full max-h-[calc(100vh-140px)] rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden ${!isAttendanceMode ? 'lg:max-h-[calc(100vh-7rem)]' : ''}`}>
+        <div className={`bg-white flex flex-col h-full rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden ${isAttendanceMode ? 'max-h-[calc(100vh-140px)]' : 'lg:max-h-[calc(100vh-7rem)]'} ${className}`}>
             <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-white flex-shrink-0 z-10 w-full">
                 <div className="flex items-center gap-2">
                     <h3 className="font-bold text-gray-900">Checkout</h3>

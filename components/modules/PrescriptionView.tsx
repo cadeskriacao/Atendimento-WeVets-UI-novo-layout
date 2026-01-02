@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAttendance } from '../../contexts/AttendanceContext';
-import { Pill, Plus, Trash2, Info, Search, Flag, CheckCircle, AlertTriangle, Clock, Scissors, ShieldCheck, Activity } from 'lucide-react';
+import { FileText, Plus, Trash2, Info, Search, Flag, CheckCircle, AlertTriangle, Clock, Scissors, ShieldCheck, Activity } from 'lucide-react';
 import { Button } from '../ui';
 import { PrescriptionItem } from '../../types';
 
@@ -57,15 +57,15 @@ export const PrescriptionView: React.FC = () => {
     };
 
     return (
-        <div className="relative min-h-[600px]">
+        <div className="relative h-full flex flex-col">
             {isLocked && (
-                <div className="absolute inset-0 z-[60] flex items-center justify-center bg-slate-50/50 backdrop-blur-[8px] rounded-2xl border border-gray-100 shadow-inner">
-                    <div className="bg-white p-8 rounded-3xl shadow-2xl border border-gray-100 flex flex-col items-center text-center max-w-sm animate-in zoom-in-95 duration-300 relative">
-                        <div className="w-20 h-20 bg-primary-50 rounded-full flex items-center justify-center mb-6 ring-8 ring-primary-50/50">
-                            <Pill size={40} className="text-primary-600" />
+                <div className="absolute inset-0 z-[60] flex items-center justify-center bg-slate-50/50 backdrop-blur-[8px] rounded-2xl border border-gray-100 shadow-inner p-4">
+                    <div className="bg-white p-6 md:p-8 rounded-3xl shadow-2xl border border-gray-100 flex flex-col items-center text-center w-full max-w-sm animate-in zoom-in-95 duration-300 relative">
+                        <div className="w-16 h-16 md:w-20 md:h-20 bg-primary-50 rounded-full flex items-center justify-center mb-4 md:mb-6 ring-8 ring-primary-50/50">
+                            <FileText size={32} className="md:w-10 md:h-10 text-primary-600" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-3">Receituário Bloqueado</h3>
-                        <p className="text-gray-600 leading-relaxed mb-8">
+                        <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2 md:mb-3">Encaminhamento Bloqueado</h3>
+                        <p className="text-sm md:text-base text-gray-600 leading-relaxed mb-6 md:mb-8">
                             Para prescrever medicamentos, primeiro é necessário <span className="font-bold text-primary-600">Iniciar o atendimento médico</span> através do menu lateral.
                         </p>
                         <div className="flex items-center gap-2 text-[10px] font-bold text-primary-600 uppercase tracking-widest bg-primary-50 px-4 py-2 rounded-full">
@@ -76,27 +76,19 @@ export const PrescriptionView: React.FC = () => {
                 </div>
             )}
 
-            <div className={`space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 ${isLocked ? 'pointer-events-none select-none grayscale-[0.5] opacity-30 shadow-none' : ''}`}>
+            <div className={`space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 flex-1 ${isLocked ? 'pointer-events-none select-none grayscale-[0.5] opacity-30 shadow-none overflow-hidden' : ''}`}>
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-100 pb-6">
                     <div>
                         <h2 className="text-2xl font-black text-gray-900 flex items-center gap-3">
                             <span className="p-2 bg-primary-100 text-primary-600 rounded-lg">
-                                <Pill size={24} />
+                                <FileText size={24} />
                             </span>
-                            Receituário Médico
+                            Encaminhamento Médico
                         </h2>
-                        <p className="text-gray-500 mt-1">Prescreva medicações com segurança baseada no peso do paciente.</p>
+                        <p className="text-gray-500 mt-1">Gere encaminhamentos e solicitações com segurança.</p>
                     </div>
 
-                    <div className="flex items-center gap-3 bg-blue-50 px-4 py-2 rounded-xl border border-blue-100">
-                        <div className="p-2 bg-white rounded-lg shadow-sm">
-                            <Activity size={18} className="text-primary-500" />
-                        </div>
-                        <div>
-                            <div className="text-[10px] font-bold text-primary-500 uppercase tracking-wider">Peso Atual</div>
-                            <div className="text-lg font-black text-primary-700">{petWeight > 0 ? `${petWeight} kg` : '---'}</div>
-                        </div>
-                    </div>
+                    {/* Peso Atual - HIDDEN BY USER REQUEST */}
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -143,23 +135,7 @@ export const PrescriptionView: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Quick Guidance Card */}
-                        <div className="bg-gradient-to-br from-primary-600 to-primary-800 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden group">
-                            <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-700">
-                                <ShieldCheck size={120} />
-                            </div>
-                            <div className="relative z-10">
-                                <div className="flex items-center gap-2 mb-4">
-                                    <div className="p-1 px-2 bg-white/20 rounded text-[10px] font-bold tracking-widest uppercase backdrop-blur-md border border-white/20">
-                                        Smart Check
-                                    </div>
-                                </div>
-                                <h4 className="font-bold text-lg mb-2">Segurança em 1º lugar</h4>
-                                <p className="text-white/80 text-sm leading-relaxed">
-                                    Nossa IA valida se a posologia inserida é condizente com o peso de {petWeight > 0 ? `${petWeight}kg` : 'paciente'} para evitar superdosagem.
-                                </p>
-                            </div>
-                        </div>
+                        {/* Smart Check Card - HIDDEN BY USER REQUEST */}
                     </div>
 
                     {/* Right: Prescribed Items */}
@@ -170,7 +146,7 @@ export const PrescriptionView: React.FC = () => {
                                     <div className="p-2 bg-white rounded-lg border border-gray-200 shadow-sm text-gray-500">
                                         <Clock size={18} />
                                     </div>
-                                    <h3 className="font-bold text-gray-800">Itens Prescritos</h3>
+                                    <h3 className="font-bold text-gray-800">Itens de Encaminhamento</h3>
                                 </div>
                                 <span className="text-[10px] font-black bg-primary-600 text-white px-3 py-1 rounded-full uppercase tracking-widest shadow-lg shadow-primary-200">
                                     {attendance.prescriptions.length} ITEM(NS)
@@ -181,9 +157,9 @@ export const PrescriptionView: React.FC = () => {
                                 {attendance.prescriptions.length === 0 ? (
                                     <div className="text-center py-20 flex flex-col items-center">
                                         <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center text-gray-200 mb-4 border border-gray-100 border-dashed">
-                                            <Pill size={40} />
+                                            <FileText size={40} />
                                         </div>
-                                        <p className="text-gray-400 max-w-xs font-medium">Use a busca ao lado para adicionar os medicamentos à receita.</p>
+                                        <p className="text-gray-400 max-w-xs font-medium">Use a busca ao lado para adicionar itens ao encaminhamento.</p>
                                     </div>
                                 ) : (
                                     <div className="space-y-4">
@@ -220,10 +196,7 @@ export const PrescriptionView: React.FC = () => {
                                                             <div className="flex items-center gap-2 mb-2">
                                                                 <h4 className="font-black text-gray-900 text-lg leading-tight">{item.name}</h4>
                                                             </div>
-                                                            <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-wider border ${badgeParams}`}>
-                                                                {doseCheck.status === 'safe' ? <CheckCircle size={10} /> : <AlertTriangle size={10} />}
-                                                                {doseCheck.label}
-                                                            </div>
+                                                            {/* Dosage validation badges - HIDDEN BY USER REQUEST */}
                                                         </div>
 
                                                         <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -262,13 +235,14 @@ export const PrescriptionView: React.FC = () => {
                                                             </div>
                                                         </div>
 
-                                                        <div className="flex flex-col justify-center border-l border-gray-100 pl-4">
+                                                        <div className="flex flex-row md:flex-col justify-end md:justify-center items-center md:border-l md:border-gray-100 md:pl-4 border-t border-gray-100 pt-4 md:border-t-0 md:pt-0 mt-2 md:mt-0">
                                                             <button
                                                                 onClick={() => removePrescription(item.id)}
-                                                                className="p-2 text-gray-200 hover:text-status-error hover:bg-red-50 rounded-xl transition-all"
+                                                                className="flex items-center gap-2 px-4 py-2 md:p-2 text-red-500 md:text-gray-200 hover:text-status-error hover:bg-red-50 rounded-xl transition-all text-xs font-bold uppercase tracking-widest md:normal-case md:font-normal"
                                                                 title="Remover medicamento"
                                                             >
                                                                 <Trash2 size={20} />
+                                                                <span className="md:hidden">Remover</span>
                                                             </button>
                                                         </div>
                                                     </div>

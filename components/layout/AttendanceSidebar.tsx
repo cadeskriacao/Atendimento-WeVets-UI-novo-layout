@@ -13,10 +13,9 @@ export const AttendanceSidebar: React.FC<AttendanceSidebarProps> = ({ onCancel }
     if (!attendance) return null;
 
     const steps: { id: AttendanceStep; label: string; icon: React.ReactNode }[] = [
-
-        { id: 'ANAMNESIS', label: 'Anamnese', icon: <FileText size={20} /> },
         { id: 'SERVICES', label: 'Serviços', icon: <ShoppingCart size={20} /> },
-        { id: 'PRESCRIPTION', label: 'Receituário', icon: <Pill size={20} /> },
+        { id: 'ANAMNESIS', label: 'Anamnese', icon: <FileText size={20} /> },
+        { id: 'PRESCRIPTION', label: 'Encaminhamento', icon: <FileText size={20} /> },
         { id: 'SUMMARY', label: 'Resumo', icon: <CheckCircle size={20} /> },
     ];
 
@@ -53,7 +52,7 @@ export const AttendanceSidebar: React.FC<AttendanceSidebarProps> = ({ onCancel }
                         {STATUS_LABELS[attendance.status]}
                     </span>
                 </div>
-                <h2 className="font-bold text-gray-900 text-lg leading-tight">Atendimento <span className="text-gray-400 font-normal ml-0.5">#{attendance.id.substring(0, 4)}</span></h2>
+                <h2 className="font-bold text-gray-900 text-lg leading-tight">Atendimento</h2>
             </div>
 
             <nav className="flex-1 px-4 py-2 space-y-1 mt-2 overflow-y-auto custom-scrollbar">
@@ -82,7 +81,7 @@ export const AttendanceSidebar: React.FC<AttendanceSidebarProps> = ({ onCancel }
                 })}
             </nav>
 
-            <div className={`p-4 border-t border-gray-100 bg-slate-50/50 mt-auto transition-all duration-300 ${attendance.status === 'INITIATED' ? 'opacity-0 h-0 p-0 pointer-events-none' : 'opacity-100'}`}>
+            <div className={`p-4 border-t border-gray-100 bg-slate-50/50 mt-auto transition-all duration-300 opacity-100`}>
                 <div className="space-y-3">
                     {attendance.status === 'IN_PROGRESS' ? (
                         <button
@@ -95,7 +94,7 @@ export const AttendanceSidebar: React.FC<AttendanceSidebarProps> = ({ onCancel }
                                 <span>atendimento</span>
                             </div>
                         </button>
-                    ) : attendance.status === 'SCHEDULED' ? (
+                    ) : (attendance.status === 'SCHEDULED' || attendance.status === 'INITIATED') ? (
                         <button
                             onClick={startMedicalAttendance}
                             className="w-full py-4 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-2xl text-base shadow-lg shadow-primary-500/20 transition-all flex items-center justify-center gap-4"

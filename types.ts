@@ -146,6 +146,7 @@ export interface Attendance {
     time: string;
     location: 'clinic' | 'home';
   };
+  cancellationReason?: string;
   budgetGenerated?: boolean;
 
   createdAt: string;

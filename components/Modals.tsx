@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Calendar as CalendarIcon, Clock, Cat, ShoppingCart, Trash2, Upload, Printer, Info, CheckCircle2, AlertTriangle, Check, ChevronDown, ChevronUp, FileText, MessageCircle } from 'lucide-react';
-import { CartItem, ModalType, Pet, Service, Tutor } from '../types';
+import { Attendance, CartItem, ModalType, Pet, Service, Tutor } from '../types';
 import { MOCK_BUDGET_ITEMS, MOCK_ATTENDANCE_HISTORY } from '../constants';
 import { Button, Input, Select, Badge, Card } from './ui';
 
@@ -17,19 +17,23 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, title, 
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-[2px] transition-opacity animate-in fade-in duration-200">
-            <div id="printable-content" className={`bg-white rounded-lg shadow-2xl w-full ${maxWidth} overflow-hidden animate-in zoom-in-95 duration-200 relative`}>
-                {title && (
-                    <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-                        <h3 className="font-bold text-lg text-gray-800">{title}</h3>
-                        {headerAction && <div className="mr-8">{headerAction}</div>}
+        <div className="fixed inset-0 z-[100] overflow-y-auto bg-gray-900/60 backdrop-blur-[2px] transition-opacity animate-in fade-in duration-200">
+            <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                {/* Overlay click handler could be added here if needed, but we have Close button */}
+
+                <div id="printable-content" className={`relative transform overflow-hidden rounded-lg bg-white text-left shadow-2xl transition-all sm:my-8 w-full ${maxWidth} animate-in zoom-in-95 duration-200`}>
+                    {title && (
+                        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-10">
+                            <h3 className="font-bold text-lg text-gray-800">{title}</h3>
+                            {headerAction && <div className="mr-8">{headerAction}</div>}
+                        </div>
+                    )}
+                    <button onClick={onClose} className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full text-gray-400 hover:text-gray-600 transition-colors z-20 bg-white/80 backdrop-blur-sm">
+                        <X size={20} />
+                    </button>
+                    <div className="p-0">
+                        {children}
                     </div>
-                )}
-                <button onClick={onClose} className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full text-gray-400 hover:text-gray-600 transition-colors z-10">
-                    <X size={20} />
-                </button>
-                <div className="p-0">
-                    {children}
                 </div>
             </div>
         </div>
@@ -213,138 +217,104 @@ export const ConfirmBudgetModal: React.FC<{
 export const FinalizeModal: React.FC<{
     items: CartItem[];
     onClose: () => void;
+    onConfirm?: () => void;
     isAttendanceMode?: boolean;
     isFeesPaid?: boolean;
     onCancelProcess?: () => void;
-}> = ({ items, onClose, isAttendanceMode = false, isFeesPaid = false, onCancelProcess }) => {
+}> = ({ items, onClose, onConfirm, isAttendanceMode = false, isFeesPaid = false, onCancelProcess }) => {
+    const [paymentMethod, setPaymentMethod] = useState<'pix' | 'card' | null>(null);
 
-    // Identificar itens com pendências
-    const pendingItems = items.filter(item => (item.anticipationFee && item.anticipationFee > 0) || (item.limitFee && item.limitFee > 0));
-
-    // Determinar se há bloqueio ativo (tem pendências e não foi pago)
-    const hasPendingFees = pendingItems.length > 0 && !isFeesPaid;
-
-    // Filtrar itens para exibição na lista principal: Se houver bloqueio, remove os itens pendentes da lista visual
-    const displayItems = hasPendingFees ? items.filter(item => !pendingItems.includes(item)) : items;
-
-    // Calcular totais baseados nos itens visíveis
-    const cartTotal = displayItems.reduce((sum, item) => sum + (item.copay * item.quantity), 0);
-    const contractedTotal = isAttendanceMode ? MOCK_CONTRACTED_SERVICES.reduce((acc, item) => acc + item.price, 0) : 0;
-    const grandTotal = cartTotal + contractedTotal;
-
-    const totalPending = pendingItems.reduce((acc, item) => {
-        const anticipation = item.anticipationFee ? item.anticipationFee * item.quantity : 0;
-        const limit = item.limitFee ? item.limitFee * item.quantity : 0;
-        return acc + anticipation + limit;
+    // Calcular totais
+    const grandTotal = items.reduce((sum, item) => {
+        const itemTotal = (item.copay + (item.anticipationFee || 0) + (item.limitFee || 0)) * item.quantity;
+        return sum + itemTotal;
     }, 0);
 
     return (
         <Modal isOpen={true} onClose={onClose} title="Finalizar atendimento">
             <div className="p-6 pt-2">
-                <div className="text-gray-600 mb-6 text-sm">
-                    <p className="mb-1"><strong className="text-gray-800">Dia 14/01/2026 às 14:30</strong></p>
-                    <p className="mb-1">WeVets - Unidade Jardins (aqui)</p>
-                    <p>Rua Augusta, 1234 - Jardins, São Paulo - SP</p>
+                <div className="text-gray-600 mb-8 text-sm">
+                    <p className="mb-1"><span className="text-gray-900 font-bold">Dia 14/01/2026 às 14:30</span></p>
+                    <p className="mb-1 text-gray-500">WeVets - Unidade Jardins (aqui)</p>
+                    <p className="text-gray-500">Rua Augusta, 1234 - Jardins, São Paulo - SP</p>
                 </div>
 
-                {/* Warning Banner for Pending Fees */}
-                {hasPendingFees && (
-                    <div className="bg-primary-50 border border-primary-200 rounded-lg p-5 mb-6 animate-in fade-in zoom-in-95 duration-300">
-                        <div className="flex gap-2 items-start mb-4">
-                            <AlertTriangle className="text-primary-600 shrink-0 mt-0.5" size={20} />
-                            <p className="text-primary-600 font-bold text-base leading-tight">
-                                Atenção! Tutor precisa realizar esses pagamentos antes de finalizar o atendimento
-                            </p>
-                        </div>
-
-                        <div className="space-y-4 mb-5">
-                            {pendingItems.map(item => (
-                                <div key={item.id} className="flex justify-between items-start text-sm">
-                                    <div>
-                                        <span className="font-bold text-gray-800 block mb-0.5">{item.name}</span>
-                                        <span className="text-xs text-gray-600">
-                                            {item.anticipationFee ? 'Antecipação da Carência:' : 'Compra de Limite:'}
-                                        </span>
-                                    </div>
-                                    <span className="font-bold text-gray-800">
-                                        R$ {((item.anticipationFee || 0) + (item.limitFee || 0)).toFixed(2).replace('.', ',')}
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className="flex justify-between items-center text-sm font-bold text-gray-900 border-t border-primary-200 pt-3 mb-4">
-                            <span>Total</span>
-                            <span className="text-lg">R$ {totalPending.toFixed(2).replace('.', ',')}</span>
-                        </div>
-                    </div>
-                )}
-
-                <div className="border-t border-b border-gray-100 py-4 mb-6">
-                    <div className="flex justify-between font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">
+                <div className="mb-8">
+                    <div className="flex justify-between text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">
                         <span>Serviços contratados</span>
                         <span>Coparticipação</span>
                     </div>
 
-                    <div className="space-y-4 text-sm text-gray-600 mb-4 max-h-[30vh] overflow-y-auto pr-2">
-                        {isAttendanceMode && (
-                            <>
-                                {MOCK_CONTRACTED_SERVICES.map((service, idx) => (
-                                    <div key={idx} className="flex justify-between">
-                                        <span className="text-gray-600">{service.name}</span>
-                                        <span className="font-medium text-gray-600">R$ {service.price.toFixed(2).replace('.', ',')}</span>
-                                    </div>
-                                ))}
-                            </>
-                        )}
+                    <div className="space-y-5 mb-6 max-h-[35vh] overflow-y-auto pr-2 custom-scrollbar">
+                        {items.map(item => {
+                            const itemTotal = (item.copay + (item.anticipationFee || 0) + (item.limitFee || 0)) * item.quantity;
+                            const hasAdditionalFees = (item.anticipationFee || 0) > 0 || (item.limitFee || 0) > 0;
 
-                        {displayItems.length > 0 && (
-                            <div className={`${isAttendanceMode ? "mt-4" : ""}`}>
-                                {displayItems.map(item => (
-                                    <div key={item.id} className="flex justify-between">
-                                        <span className={isAttendanceMode ? "text-gray-800 font-medium" : ""}>
+                            return (
+                                <div key={item.id} className="flex justify-between text-sm items-start border-b border-gray-50 pb-3 last:border-0 last:pb-0">
+                                    <div className="flex flex-col">
+                                        <span className="text-gray-900 font-bold leading-tight">
                                             {item.quantity > 1 ? `${item.quantity}x ` : ''}{item.name}
                                         </span>
-                                        <span className={`font-medium ${isAttendanceMode ? 'text-gray-800' : 'text-gray-800'}`}>
-                                            R$ {(item.copay * item.quantity).toFixed(2).replace('.', ',')}
-                                        </span>
+                                        {hasAdditionalFees && (
+                                            <span className="text-[10px] text-primary-600 font-black uppercase tracking-tight mt-1 bg-primary-50 px-1.5 py-0.5 rounded w-fit">
+                                                {item.anticipationFee ? 'Inclui Antecipação de Carência' : 'Inclui Compra de Limite'}
+                                            </span>
+                                        )}
                                     </div>
-                                ))}
-                            </div>
-                        )}
+                                    <span className="text-gray-900 font-black shrink-0">
+                                        R$ {itemTotal.toFixed(2).replace('.', ',')}
+                                    </span>
+                                </div>
+                            );
+                        })}
                     </div>
 
-                    <div className="flex justify-between items-center text-lg font-bold bg-gray-100 p-4 rounded-lg border border-gray-100">
-                        <span className="text-gray-600">Total</span>
-                        <span className="text-primary-600">R$ {grandTotal.toFixed(2).replace('.', ',')}</span>
-                    </div>
-                </div>
-
-                <div className="mb-6">
-                    <p className="font-bold text-gray-800 mb-3 text-sm">Forma de pagamento recebida</p>
-                    <div className="flex gap-6">
-                        <label className="flex items-center gap-2 cursor-pointer group">
-                            <input type="radio" name="payment" className="w-4 h-4 text-primary-600 border-gray-300 focus:ring-primary-500" disabled={hasPendingFees} />
-                            <span className={`group-hover:text-primary-600 transition-colors ${hasPendingFees ? 'text-gray-300' : 'text-gray-700'}`}>PIX</span>
-                        </label>
-                        <label className="flex items-center gap-2 cursor-pointer group">
-                            <input type="radio" name="payment" className="w-4 h-4 text-primary-600 border-gray-300 focus:ring-primary-500" disabled={hasPendingFees} />
-                            <span className={`group-hover:text-primary-600 transition-colors ${hasPendingFees ? 'text-gray-300' : 'text-gray-700'}`}>Cartão de crédito/débito</span>
-                        </label>
+                    <div className="flex justify-between items-center text-xl font-bold bg-slate-900 text-white p-6 rounded-2xl shadow-xl shadow-slate-900/10">
+                        <span className="text-slate-400 font-medium">Total</span>
+                        <span className="font-black text-2xl">R$ {grandTotal.toFixed(2).replace('.', ',')}</span>
                     </div>
                 </div>
 
-                <div className="flex gap-3">
+                <div className="mb-8 p-1">
+                    <p className="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wider opacity-60">Forma de pagamento recebida</p>
+                    <div className="grid grid-cols-2 gap-4">
+                        <label className={`flex items-center justify-center gap-3 p-4 rounded-xl border-2 transition-all cursor-pointer ${paymentMethod === 'pix' ? 'border-primary-600 bg-primary-50' : 'border-gray-100 bg-white hover:border-gray-200'}`}>
+                            <input
+                                type="radio"
+                                name="payment"
+                                className="hidden"
+                                onChange={() => setPaymentMethod('pix')}
+                                checked={paymentMethod === 'pix'}
+                            />
+                            <Check className={`shrink-0 ${paymentMethod === 'pix' ? 'text-primary-600 opacity-100' : 'opacity-0'}`} size={18} />
+                            <span className={`font-black uppercase tracking-widest text-[10px] ${paymentMethod === 'pix' ? 'text-primary-700' : 'text-gray-400'}`}>PIX</span>
+                        </label>
+                        <label className={`flex items-center justify-center gap-3 p-4 rounded-xl border-2 transition-all cursor-pointer ${paymentMethod === 'card' ? 'border-primary-600 bg-primary-50' : 'border-gray-100 bg-white hover:border-gray-200'}`}>
+                            <input
+                                type="radio"
+                                name="payment"
+                                className="hidden"
+                                onChange={() => setPaymentMethod('card')}
+                                checked={paymentMethod === 'card'}
+                            />
+                            <Check className={`shrink-0 ${paymentMethod === 'card' ? 'text-primary-600 opacity-100' : 'opacity-0'}`} size={18} />
+                            <span className={`font-black uppercase tracking-widest text-[10px] ${paymentMethod === 'card' ? 'text-primary-700' : 'text-gray-400'}`}>Cartão</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div className="flex flex-col-reverse sm:flex-row gap-3">
                     <button
-                        onClick={onCancelProcess ? onCancelProcess : onClose}
-                        className="flex-1 bg-white border border-primary-300 text-primary-600 font-bold py-3 rounded-md hover:bg-primary-50 transition-colors"
+                        onClick={onCancelProcess || onClose}
+                        className="w-full sm:flex-1 bg-white border-2 border-primary-100 text-primary-700 font-bold uppercase tracking-widest text-xs py-4 rounded-xl hover:bg-primary-50 transition-all font-sans"
                     >
                         Cancelar
                     </button>
                     <button
-                        onClick={onClose}
-                        disabled={hasPendingFees}
-                        className="flex-[2] bg-primary-600 text-white font-bold py-3 rounded-md hover:bg-primary-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={onConfirm || onClose}
+                        disabled={!paymentMethod}
+                        className="w-full sm:flex-[2] bg-primary-700 text-white font-bold uppercase tracking-widest text-xs py-4 rounded-xl hover:bg-primary-800 transition-all shadow-lg shadow-primary-900/10 disabled:opacity-30 disabled:cursor-not-allowed font-sans"
                     >
                         Finalizar atendimento
                     </button>
@@ -355,10 +325,11 @@ export const FinalizeModal: React.FC<{
 };
 
 export const CancelAttendanceModal: React.FC<{
+    attendance: Attendance;
     onClose: () => void;
-    onConfirm: () => void;
-}> = ({ onClose, onConfirm }) => {
-    const [selectedReason, setSelectedReason] = useState<string>('');
+    onConfirm: (reason: string) => void;
+}> = ({ attendance, onClose, onConfirm }) => {
+    const [selectedId, setSelectedId] = useState<string>('');
     const [otherReasonText, setOtherReasonText] = useState<string>('');
 
     const reasons = [
@@ -366,66 +337,73 @@ export const CancelAttendanceModal: React.FC<{
         { id: 'other', label: 'Outro motivo' }
     ];
 
-    const isConfirmDisabled = !selectedReason || (selectedReason === 'other' && !otherReasonText.trim());
+    const isConfirmDisabled = !selectedId || (selectedId === 'other' && !otherReasonText.trim());
+
+    const handleConfirm = () => {
+        const selectedReason = reasons.find(r => r.id === selectedId);
+        const finalReason = selectedId === 'other' ? otherReasonText : (selectedReason?.label || '');
+        onConfirm(finalReason);
+    };
 
     return (
         <Modal isOpen={true} onClose={onClose} title="Cancelar atendimento" maxWidth="max-w-md">
             <div className="p-6 pt-2">
-                <div className="mb-4">
-                    <p className="font-bold text-gray-800 mb-1">Dia 14/01/2026 às 14:30</p>
-                    <p className="text-sm text-gray-600">WeVets - Unidade Jardins (aqui)</p>
-                    <p className="text-sm text-gray-600">Rua Augusta, 1234 - Jardins, São Paulo - SP</p>
+                <div className="mb-6">
+                    <p className="font-bold text-gray-800 mb-1">
+                        Dia {attendance.schedulingInfo?.date.split('-').reverse().join('/') || '14/01/2026'} às {attendance.schedulingInfo?.time || '14:30'}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                        {attendance.schedulingInfo?.location === 'home' ? 'Atendimento em domicílio' : 'WeVets - Unidade Jardins (aqui)'}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                        {attendance.schedulingInfo?.location === 'home' ? 'Endereço cadastrado no tutor' : 'Rua Augusta, 1234 - Jardins, São Paulo - SP'}
+                    </p>
                 </div>
 
-                <Button variant="outline" className="w-full mb-6 text-primary-600 border-primary-300">
-                    Ver anamnese
-                </Button>
-
                 <div className="mb-6">
-                    <h4 className="font-bold text-gray-800 mb-3 text-sm">Informe o motivo</h4>
+                    <h4 className="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wider opacity-60">Informe o motivo</h4>
                     <div className="space-y-3">
                         {reasons.map(reason => (
                             <button
                                 key={reason.id}
-                                onClick={() => setSelectedReason(reason.id)}
-                                className={`w-full p-3 rounded-md border flex items-center justify-center gap-2 font-medium transition-all
-                                    ${selectedReason === reason.id
-                                        ? 'bg-teal-700 text-white border-teal-700'
-                                        : 'bg-white text-primary-600 border-primary-200 hover:border-primary-400'
+                                onClick={() => setSelectedId(reason.id)}
+                                className={`w-full p-4 rounded-xl border flex items-center justify-center gap-2 font-bold transition-all text-sm
+                                    ${selectedId === reason.id
+                                        ? 'bg-slate-700 text-white border-slate-700 shadow-lg shadow-slate-200'
+                                        : 'bg-white text-primary-700 border-primary-100 hover:border-primary-300 hover:bg-primary-50'
                                     }
                                 `}
                             >
-                                {selectedReason === reason.id && <Check size={18} />}
+                                {selectedId === reason.id && <Check size={18} />}
                                 {reason.label}
                             </button>
                         ))}
                     </div>
 
-                    {selectedReason === 'other' && (
+                    {selectedId === 'other' && (
                         <textarea
-                            className="w-full mt-3 border border-gray-300 rounded-md p-3 h-24 focus:ring-2 focus:ring-primary-500 outline-none text-sm animate-in fade-in slide-in-from-top-2 duration-200"
-                            placeholder="Inclua uma breve descrição do motivo do não-comparecimento"
+                            className="w-full mt-4 border border-gray-200 rounded-xl p-4 h-28 focus:ring-4 focus:ring-primary-100 focus:border-primary-300 outline-none text-sm font-medium transition-all animate-in fade-in slide-in-from-top-2 duration-300 placeholder:text-gray-400"
+                            placeholder="Inclua uma breve descrição do motivo do cancelamento..."
                             value={otherReasonText}
                             onChange={(e) => setOtherReasonText(e.target.value)}
                         />
                     )}
                 </div>
 
-                <div className="space-y-3">
-                    <Button
-                        onClick={onConfirm}
+                <div className="space-y-3 pt-2">
+                    <button
+                        onClick={handleConfirm}
                         disabled={isConfirmDisabled}
-                        className="w-full"
+                        className="w-full bg-primary-700 text-white font-black uppercase tracking-widest text-[10px] py-4 rounded-xl shadow-lg shadow-primary-900/10 hover:bg-primary-800 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                     >
                         Cancelar atendimento
-                    </Button>
-                    <Button
-                        variant="outline"
+                    </button>
+                    <button
                         onClick={onClose}
-                        className="w-full border-primary-300 text-primary-600"
+                        className="w-full bg-white border-2 border-primary-100 text-primary-700 font-black uppercase tracking-widest text-[10px] py-4 rounded-xl hover:bg-primary-50 transition-all"
                     >
                         Voltar
-                    </Button>
+                    </button>
                 </div>
             </div>
         </Modal>
@@ -737,11 +715,11 @@ export const AnamnesisModal: React.FC<{
                     </div>
                 </div>
 
-                <div className="flex justify-end gap-3">
-                    <Button variant="ghost" onClick={onClose} className="text-primary-600 hover:bg-primary-50">
+                <div className="flex flex-col-reverse sm:flex-row justify-end gap-3">
+                    <Button variant="ghost" onClick={onClose} className="w-full sm:w-auto text-primary-600 hover:bg-primary-50">
                         Cancelar
                     </Button>
-                    <Button onClick={handleSave}>
+                    <Button onClick={handleSave} className="w-full sm:w-auto">
                         Salvar Anamnese
                     </Button>
                 </div>
@@ -865,6 +843,14 @@ export const NoCoverageModal: React.FC<{
                 </div>
 
                 <div className="space-y-3">
+                    <Button
+                        variant="outline"
+                        onClick={() => alert('Link de upgrade enviado via WhatsApp!')}
+                        className="w-full border-green-500 text-green-600 hover:bg-green-50 font-bold"
+                        leftIcon={<MessageCircle size={18} />}
+                    >
+                        Conversar com Tutor (WhatsApp)
+                    </Button>
                     <Button variant="ghost" onClick={onClose} className="w-full text-gray-500 hover:text-gray-700">
                         Voltar
                     </Button>
@@ -1065,18 +1051,47 @@ export const UpgradePlanModal: React.FC<{
                     <div className="p-4 border-b border-gray-200 text-center text-sm font-bold text-green-600"><Check size={16} className="mx-auto" /></div>
 
                     {/* Row 4 */}
-                    <div className="p-4 border-br border-r border-gray-200 text-sm font-medium text-gray-700">Internação</div>
-                    <div className="p-4 border-br border-r border-gray-200 text-center text-sm text-gray-600">Coparticipação</div>
-                    <div className="p-4 border-br border-r border-primary-100 bg-primary-50/30 text-center text-sm font-bold text-gray-800">10 dias/ano</div>
-                    <div className="p-4 border-br border-gray-200 text-center text-sm font-bold text-gray-800">Ilimitado</div>
+                    <div className="p-4 border-b border-r border-gray-200 text-sm font-medium text-gray-700">Internação</div>
+                    <div className="p-4 border-b border-r border-gray-200 text-center text-sm text-gray-600">Coparticipação</div>
+                    <div className="p-4 border-b border-r border-primary-100 bg-primary-50/30 text-center text-sm font-bold text-gray-800">10 dias/ano</div>
+                    <div className="p-4 border-b border-gray-200 text-center text-sm font-bold text-gray-800">Ilimitado</div>
+
+                    {/* Action Row */}
+                    <div className="p-4 border-r border-gray-200 font-bold text-gray-400 text-xs uppercase flex items-center">Ações</div>
+                    <div className="p-4 border-r border-gray-200 text-center flex items-center justify-center italic text-gray-400 text-xs">
+                        Plano Atual
+                    </div>
+                    <div className="p-4 border-r border-primary-100 bg-primary-50/30 text-center space-y-2">
+                        <Button className="w-full h-10 text-xs shadow-md font-bold">
+                            Upgrade p/ Super
+                        </Button>
+                        <Button
+                            variant="outline"
+                            className="w-full h-10 text-[10px] border-green-500 text-green-600 hover:bg-green-50 font-black uppercase tracking-tighter flex items-center justify-center gap-1.5"
+                            onClick={() => alert('Comparativo Super enviado via WhatsApp!')}
+                        >
+                            <MessageCircle size={14} className="shrink-0" />
+                            <span>Enviar para Whatsapp</span>
+                        </Button>
+                    </div>
+                    <div className="p-4 text-center space-y-2">
+                        <Button className="w-full h-10 text-xs bg-gray-800 hover:bg-gray-900 shadow-sm font-bold">
+                            Upgrade p/ Ultra
+                        </Button>
+                        <Button
+                            variant="outline"
+                            className="w-full h-10 text-[10px] border-green-500 text-green-600 hover:bg-green-50 font-black uppercase tracking-tighter flex items-center justify-center gap-1.5"
+                            onClick={() => alert('Comparativo Ultra enviado via WhatsApp!')}
+                        >
+                            <MessageCircle size={14} className="shrink-0" />
+                            <span>Enviar para Whatsapp</span>
+                        </Button>
+                    </div>
                 </div>
 
-                <div className="flex justify-end gap-3">
-                    <Button variant="outline" onClick={onClose} className="px-6 border-primary-300 text-primary-600 hover:bg-primary-50">
-                        Cancelar
-                    </Button>
-                    <Button className="px-8 shadow-sm">
-                        Selecionar Plano Super (Upgrade)
+                <div className="flex justify-end pt-4 border-t border-gray-100">
+                    <Button variant="ghost" onClick={onClose} className="px-8 text-gray-400 hover:text-gray-600 hover:bg-gray-50">
+                        Fechar
                     </Button>
                 </div>
             </div>

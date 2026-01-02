@@ -41,7 +41,7 @@ export class MockAttendanceService implements IAttendanceService {
             petId,
             tutorId,
             status: 'INITIATED',
-            currentStep: 'ANAMNESIS',
+            currentStep: 'SERVICES',
             triage: {},
             anamnesis: {
                 mainComplaint: '', // Will be filled by user

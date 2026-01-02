@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { AttendanceSidebar } from './AttendanceSidebar';
+import { AttendanceTabs } from './AttendanceTabs';
 import { Header } from '../Header';
 import { ClinicalStatusBar } from './ClinicalStatusBar';
 
@@ -9,8 +9,10 @@ interface ClinicalLayoutProps {
     onGoHome?: () => void;
     header?: ReactNode; // New prop for full-width header content
     banner?: ReactNode;
+    overlay?: ReactNode; // New prop for overlays (e.g., blockers) that sit below the main header
     onCancelAttendance?: () => void;
-    hideSidebar?: boolean; // New prop to control left sidebar visibility
+    onFinalizeAttendance?: () => void;
+    hideSidebar?: boolean; // Prop kept for compatibility but left sidebar is removed
 }
 
 export const ClinicalLayout: React.FC<ClinicalLayoutProps> = ({
@@ -19,36 +21,40 @@ export const ClinicalLayout: React.FC<ClinicalLayoutProps> = ({
     onGoHome,
     header,
     banner,
+    overlay,
     onCancelAttendance,
+    onFinalizeAttendance,
     hideSidebar = false
 }) => {
     return (
         <div className="h-screen bg-gray-100 flex flex-col font-sans overflow-hidden">
             <Header onGoHome={onGoHome} /> {/* Top Navigation Bar */}
 
-            <div className="flex flex-1 w-full mx-auto relative overflow-hidden">
-                {/* Left Sidebar - Navigation (FIXED) */}
-                {!hideSidebar && (
-                    <aside className="hidden lg:flex z-20 w-64 flex-shrink-0 flex-col h-full p-3 pr-1 overflow-hidden">
-                        <AttendanceSidebar onCancel={onCancelAttendance} />
-                    </aside>
-                )}
+            <div className="flex flex-1 w-full max-w-[1600px] mx-auto relative overflow-hidden">
+                {/* Overlay Area (Blockers, etc.) - Positioned below Header, covers everything else */}
+                {overlay}
 
                 {/* Main Body Area */}
                 <main className="flex-1 min-w-0 bg-slate-50/50 flex flex-col overflow-hidden relative">
                     {/* PetHeader Area (FIXED) */}
                     {header && (
-                        <div className="w-full z-[60] px-3 mt-3 mb-1 flex-shrink-0">
-                            <div className="max-w-7xl mx-auto">
+                        <div className="w-full z-[60] px-3 mt-3 flex-shrink-0">
+                            <div className="w-full space-y-3">
                                 {header}
                             </div>
                         </div>
                     )}
 
-                    {/* Scrollable Clinical Content Area */}
-                    <div className="flex-1 overflow-y-auto custom-scrollbar p-3 pt-1 pb-16">
-                        <div className="max-w-7xl mx-auto space-y-4">
-                            {children}
+                    {/* Unified Clinical Content Card */}
+                    <div className="flex-1 overflow-hidden p-3 pt-3 pb-2 md:pb-16 flex flex-col">
+                        <div className="w-full flex-1 flex flex-col bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-gray-200 overflow-hidden">
+                            {/* Horizontal Tabs Navigation (Header of the Card) */}
+                            {header && <AttendanceTabs onCancel={onCancelAttendance} onFinalize={onFinalizeAttendance} />}
+
+                            {/* Scrollable Content (Body of the Card) */}
+                            <div className="flex-1 overflow-y-auto custom-scrollbar p-6 bg-slate-50/30">
+                                {children}
+                            </div>
                         </div>
                     </div>
                 </main>
@@ -67,3 +73,4 @@ export const ClinicalLayout: React.FC<ClinicalLayoutProps> = ({
         </div>
     );
 };
+

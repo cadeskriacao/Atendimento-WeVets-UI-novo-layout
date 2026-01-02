@@ -22,7 +22,7 @@ export const AttendanceCentral: React.FC<AttendanceCentralProps> = ({ onStartAtt
             petId: MOCK_PETS_LIST[0].id,
             tutorId: 'tutor-001',
             status: 'SCHEDULED',
-            currentStep: 'ANAMNESIS',
+            currentStep: 'SERVICES',
             triage: { weight: '4.5' },
             anamnesis: {
                 mainComplaint: '',
@@ -76,8 +76,9 @@ export const AttendanceCentral: React.FC<AttendanceCentralProps> = ({ onStartAtt
     const [filters, setFilters] = useState({ cpf: '', name: '', date: new Date().toISOString().split('T')[0] });
 
     const filteredAttendances = useMemo(() => {
-        // Merge local mock with extra (newly scheduled) attendances
-        const allAttendances = [...extraAttendances, ...attendances];
+        // Merge and deduplicate by ID, giving precedence to extraAttendances
+        const extraIds = new Set(extraAttendances.map(a => a.id));
+        const allAttendances = [...extraAttendances, ...attendances.filter(a => !extraIds.has(a.id))];
 
         return allAttendances.filter(att => {
             // Filter Logic

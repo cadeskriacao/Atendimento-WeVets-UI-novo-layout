@@ -24,6 +24,7 @@ import {
 import { useAttendance } from './contexts/AttendanceContext';
 import { AttendanceSidebar } from './components/layout/AttendanceSidebar';
 import { DashboardSidebar } from './components/layout/DashboardSidebar';
+import { MobileNavbar } from './components/layout/MobileNavbar';
 import { ClinicalLayout } from './components/layout/ClinicalLayout';
 import { AttendanceCentral } from './components/central/AttendanceCentral';
 import { CpfInputModal } from './components/CpfInputModal'; // New Import
@@ -34,7 +35,7 @@ import { mockTutorService } from './services/tutor/MockTutorService'; // Import 
 import { SalesDashboard } from './components/sales/SalesDashboard';
 
 const App: React.FC = () => {
-    const { attendance, startAttendance, cancelAttendance, setServices: setContextServices, updateTriage, scheduleAttendance, recordBudgetGeneration } = useAttendance();
+    const { attendance, startAttendance, cancelAttendance, finishAttendance, setServices: setContextServices, updateTriage, scheduleAttendance, recordBudgetGeneration } = useAttendance();
 
     const [view, setView] = useState<'search' | 'dashboard' | 'planSelection' | 'sales'>('search');
     const [activePet, setActivePet] = useState<Pet | null>(null);
@@ -254,7 +255,7 @@ const App: React.FC = () => {
             // Create emergency attendance
             const newAttendance: Partial<Attendance> = {
                 status: 'IN_PROGRESS',
-                currentStep: 'ANAMNESIS',
+                currentStep: 'SERVICES',
                 anamnesis: {
                     mainComplaint: 'EMERGÊNCIA - PRONTO SOCORRO',
                     history: { vaccination: { status: 'unknown' } },
@@ -370,7 +371,18 @@ const App: React.FC = () => {
     const handleOpenUpgradePlan = () => setActiveModal('upgradePlan');
     const handleOpenHistory = () => setActiveModal('attendanceHistory');
 
-    const handleConfirmCancellation = () => {
+    const handleConfirmCancellation = (reason: string) => {
+        if (attendance) {
+            const cancelledAtt: Attendance = {
+                ...attendance,
+                status: 'CANCELLED',
+                cancellationReason: reason,
+                updatedAt: new Date().toISOString()
+            };
+            // Add to local list so it shows up on dashboard
+            setScheduledAttendances(prev => [cancelledAtt, ...prev.filter(a => a.id !== cancelledAtt.id)]);
+        }
+
         setActiveModal('none');
         if (isClinicalMode) {
             cancelAttendance();
@@ -383,10 +395,21 @@ const App: React.FC = () => {
     };
 
     const handleAttendanceFinish = () => {
+        if (attendance) {
+            const finishedAtt: Attendance = {
+                ...attendance,
+                status: 'FINISHED',
+                updatedAt: new Date().toISOString()
+            };
+            // Add to local list so it shows up on dashboard
+            setScheduledAttendances(prev => [finishedAtt, ...prev.filter(a => a.id !== finishedAtt.id)]);
+        }
+
+        finishAttendance();
+
         // Allow time for context updates if needed, then reset UI
         setTimeout(() => {
             setActiveModal('none');
-            updateCart([]);
             setActivePet(null);
             setView('search');
             resetState();
@@ -399,7 +422,7 @@ const App: React.FC = () => {
 
     if (view === 'search') {
         return (
-            <div className="min-h-screen bg-gray-100 font-sans flex flex-col">
+            <div className="min-h-screen bg-gray-100 font-sans flex flex-col pb-20 lg:pb-0">
                 <Header onGoHome={handleGoHome} />
 
                 <div className="flex flex-1 max-h-[calc(100vh-64px)] overflow-hidden">
@@ -427,6 +450,11 @@ const App: React.FC = () => {
                         />
                     </main>
                 </div>
+
+                <MobileNavbar
+                    currentView="search"
+                    onNavigate={(view: 'search' | 'sales') => setView(view)}
+                />
 
                 {showAttendanceCancelledToast && (
                     <AttendanceCancelledToast onClose={() => setShowAttendanceCancelledToast(false)} />
@@ -458,7 +486,7 @@ const App: React.FC = () => {
 
     if (view === 'sales') {
         return (
-            <div className="min-h-screen bg-gray-100 font-sans flex flex-col">
+            <div className="min-h-screen bg-gray-100 font-sans flex flex-col pb-20 lg:pb-0">
                 <Header onGoHome={handleGoHome} />
 
                 <div className="flex flex-1 max-h-[calc(100vh-64px)] overflow-hidden">
@@ -477,6 +505,11 @@ const App: React.FC = () => {
                         </div>
                     </main>
                 </div>
+
+                <MobileNavbar
+                    currentView="sales"
+                    onNavigate={(view: 'search' | 'sales') => setView(view)}
+                />
             </div>
         );
     }
@@ -552,38 +585,39 @@ const App: React.FC = () => {
             }
             banner={null}
             onCancelAttendance={handleCancelAttendance}
-        >
-            {/* Financial Blocker Overlay */}
-            {isDelinquent && !isPlanReactivated && (
-                <div className="absolute inset-0 z-50 flex items-start pt-20 justify-center bg-white/80 backdrop-blur-sm rounded-lg transition-all duration-500">
-                    <div className="bg-white p-8 rounded-xl shadow-2xl max-w-md text-center border-l-8 border-primary-500 animate-in zoom-in duration-300">
-                        <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <AlertTriangle size={32} className="text-primary-600" />
-                        </div>
-                        <h2 className="text-2xl font-bold text-gray-800 mb-2">Pendência Financeira</h2>
-                        <p className="text-gray-600 mb-8">
-                            O tutor possui mensalidades em aberto. Para prosseguir com o atendimento, é necessário regularizar a situação.
-                        </p>
-                        <div className="space-y-3 w-full">
-                            <Button
-                                size="lg"
-                                className="w-full text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all"
-                                onClick={handleSimulatePayment}
-                            >
-                                Regularizar Agora
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="lg"
-                                className="w-full border-primary-600 text-primary-600 font-bold hover:bg-primary-50"
-                                onClick={() => alert("Link de pagamento enviado para o tutor via WhatsApp e E-mail!")}
-                            >
-                                Enviar link de pagamento
-                            </Button>
+            onFinalizeAttendance={() => setActiveModal('finalize')}
+            overlay={
+                isDelinquent && !isPlanReactivated && (
+                    <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-[2px] transition-all duration-500">
+                        <div className="bg-white p-6 md:p-8 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] w-full max-w-sm text-center border-t-4 border-status-error animate-in zoom-in-95 duration-300 mx-4">
+                            <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 ring-8 ring-red-50/50">
+                                <AlertTriangle size={32} className="text-status-error" />
+                            </div>
+                            <h2 className="text-xl md:text-2xl font-black text-gray-900 mb-2">Plano Suspenso</h2>
+                            <p className="text-sm md:text-base text-gray-500 mb-6 md:mb-8 leading-relaxed font-medium">
+                                Constam faturas em aberto para este tutor. Para prosseguir com o atendimento, é necessário regularizar as pendências.
+                            </p>
+                            <div className="space-y-3 w-full">
+                                <Button
+                                    variant="outline"
+                                    className="w-full border-red-100 text-status-error font-bold hover:bg-red-50 h-10 md:h-11 rounded-xl text-sm md:text-base transition-all"
+                                    onClick={() => alert("Link de pagamento enviado para o tutor via WhatsApp e E-mail!")}
+                                >
+                                    Enviar Link de Pagamento
+                                </Button>
+                                <Button
+                                    className="w-full bg-status-error hover:bg-red-600 text-white font-bold h-10 md:h-11 rounded-xl text-sm md:text-base shadow-lg shadow-red-200 hover:shadow-xl hover:shadow-red-300 transition-all border border-transparent"
+                                    onClick={handleSimulatePayment}
+                                >
+                                    Simular Pagamento Realizado
+                                </Button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
+        >
+            {/* Main Content */}
 
             {/* Toasts */}
             {showPlanActiveToast && <PlanActiveToast onClose={() => setShowPlanActiveToast(false)} />}
@@ -596,7 +630,7 @@ const App: React.FC = () => {
             {scheduleSuccessInfo && <ScheduleSuccessToast date={scheduleSuccessInfo.date} time={scheduleSuccessInfo.time} onClose={() => setScheduleSuccessInfo(null)} />}
 
             {/* Main Content Modules */}
-            <div className={`transition-all duration-500 ${(isDelinquent && !isPlanReactivated) ? 'opacity-25 filter blur-sm pointer-events-none' : ''}`}>
+            <div className={`transition-all duration-500 pb-20 lg:pb-0 ${(isDelinquent && !isPlanReactivated) ? 'opacity-25 filter blur-sm pointer-events-none' : ''}`}>
                 <ClinicalViewManager
                     serviceListProps={{
                         onAddToCart: addToCart,
@@ -609,6 +643,45 @@ const App: React.FC = () => {
                     onFinish={handleAttendanceFinish}
                 />
             </div>
+
+            {/* Mobile Cart Bar */}
+            <MobileCartBar
+                items={cartItems}
+                onOpenCart={() => setIsMobileCartOpen(true)}
+            />
+
+            {/* Mobile Cart Drawer */}
+            {isMobileCartOpen && (
+                <div className="fixed inset-0 z-[70] lg:hidden">
+                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onClick={() => setIsMobileCartOpen(false)} />
+                    <div className="absolute right-0 top-0 bottom-0 w-[90%] max-w-[350px] bg-white shadow-2xl animate-in slide-in-from-right duration-300 flex flex-col">
+                        <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-gray-50/50">
+                            <h3 className="font-bold text-lg text-gray-800">Seu Carrinho</h3>
+                            <button
+                                onClick={() => setIsMobileCartOpen(false)}
+                                className="p-2 bg-white border border-gray-200 rounded-full text-gray-500 hover:bg-gray-100 transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="flex-1 overflow-hidden p-3 bg-gray-50/30">
+                            <CartSidebar
+                                items={cartItems}
+                                onUpdateQuantity={updateQuantity}
+                                onRemove={removeFromCart}
+                                onAction={(action) => {
+                                    handleCartAction(action);
+                                    if (action !== 'quote') setIsMobileCartOpen(false);
+                                }}
+                                isAttendanceMode={isClinicalMode}
+                                isScheduled={attendance?.status === 'SCHEDULED'}
+                                isInProgress={attendance?.status === 'IN_PROGRESS'}
+                                className="max-h-full border-0 shadow-none bg-transparent"
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Delinquency Overlay */}
             {isDelinquent && !isPlanReactivated && (
@@ -644,8 +717,8 @@ const App: React.FC = () => {
 
 
             {/* Modals */}
-            {activeModal === 'finalize' && <FinalizeModal items={cartItems} onClose={() => setActiveModal('none')} isAttendanceMode={isClinicalMode} isFeesPaid={isFinalizeFeesPaid} onCancelProcess={handleCancelAttendance} />}
-            {activeModal === 'cancelAttendance' && <CancelAttendanceModal onClose={() => setActiveModal('finalize')} onConfirm={handleConfirmCancellation} />}
+            {activeModal === 'finalize' && <FinalizeModal items={cartItems} onClose={() => setActiveModal('none')} onConfirm={handleAttendanceFinish} isAttendanceMode={isClinicalMode} isFeesPaid={isFinalizeFeesPaid} onCancelProcess={() => setActiveModal('none')} />}
+            {activeModal === 'cancelAttendance' && attendance && <CancelAttendanceModal attendance={attendance} onClose={() => setActiveModal('none')} onConfirm={handleConfirmCancellation} />}
             {activeModal === 'schedule' && <ScheduleModal onClose={() => setActiveModal('none')} onConfirm={isClinicalMode ? (data) => {
                 scheduleAttendance(data);
                 // Add to local list for dashboard visibility
