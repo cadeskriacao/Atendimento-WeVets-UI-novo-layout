@@ -29,13 +29,7 @@ export const ClinicalStatusBar: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-4">
-                <button
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-all border border-red-100 group"
-                    title="Cobre serviços de emergência imediatamente"
-                >
-                    <Zap size={16} className="fill-red-600 group-hover:scale-110 transition-transform" />
-                    <span className="text-xs font-bold uppercase tracking-tight">Emergência</span>
-                </button>
+
 
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-100">
                     <AlertCircle size={14} />

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Plus, SearchX, Zap } from 'lucide-react';
+import { Plus, SearchX } from 'lucide-react';
 import { Button } from '../ui';
 import { AttendanceFilters } from './AttendanceFilters';
 import { AttendanceItem } from './AttendanceItem';
@@ -9,11 +9,10 @@ import { MOCK_PETS_LIST, MOCK_TUTOR, SERVICES } from '../../constants';
 interface AttendanceCentralProps {
     onStartAttendance: (attendance: Attendance) => void;
     onNewAttendance: () => void;
-    onPanic: () => void;
     extraAttendances?: Attendance[];
 }
 
-export const AttendanceCentral: React.FC<AttendanceCentralProps> = ({ onStartAttendance, onNewAttendance, onPanic, extraAttendances = [] }) => {
+export const AttendanceCentral: React.FC<AttendanceCentralProps> = ({ onStartAttendance, onNewAttendance, extraAttendances = [] }) => {
     // MOCK DATA GENERATION
     // Simulating a list of attendances fetched from backend
     const [attendances, setAttendances] = useState<Attendance[]>([
@@ -120,13 +119,6 @@ export const AttendanceCentral: React.FC<AttendanceCentralProps> = ({ onStartAtt
                     <p className="text-gray-500 mt-1">Gerencie a fila de espera e atendimentos do dia</p>
                 </div>
                 <div className="flex gap-3">
-                    <Button
-                        className="bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-200 border-none font-black tracking-wider"
-                        leftIcon={<Zap size={18} fill="currentColor" />}
-                        onClick={onPanic}
-                    >
-                        EMERGÊNCIA
-                    </Button>
                     <Button variant="primary" leftIcon={<Plus size={18} />} onClick={onNewAttendance}>
                         Novo Atendimento
                     </Button>

@@ -34,8 +34,6 @@ export const PrescriptionView: React.FC = () => {
         setSearchTerm('');
     };
 
-    const isLocked = attendance.status !== 'IN_PROGRESS';
-
     const getDosageStatus = (item: PrescriptionItem) => {
         if (!petWeight || isNaN(petWeight)) return { status: 'unknown', label: 'Peso não informado', color: 'gray' };
 
@@ -58,25 +56,7 @@ export const PrescriptionView: React.FC = () => {
 
     return (
         <div className="relative h-full flex flex-col">
-            {isLocked && (
-                <div className="absolute inset-0 z-[60] flex items-center justify-center bg-slate-50/50 backdrop-blur-[8px] rounded-2xl border border-gray-100 shadow-inner p-4">
-                    <div className="bg-white p-6 md:p-8 rounded-3xl shadow-2xl border border-gray-100 flex flex-col items-center text-center w-full max-w-sm animate-in zoom-in-95 duration-300 relative">
-                        <div className="w-16 h-16 md:w-20 md:h-20 bg-primary-50 rounded-full flex items-center justify-center mb-4 md:mb-6 ring-8 ring-primary-50/50">
-                            <FileText size={32} className="md:w-10 md:h-10 text-primary-600" />
-                        </div>
-                        <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2 md:mb-3">Encaminhamento Bloqueado</h3>
-                        <p className="text-sm md:text-base text-gray-600 leading-relaxed mb-6 md:mb-8">
-                            Para prescrever medicamentos, primeiro é necessário <span className="font-bold text-primary-600">Iniciar o atendimento médico</span> através do menu lateral.
-                        </p>
-                        <div className="flex items-center gap-2 text-[10px] font-bold text-primary-600 uppercase tracking-widest bg-primary-50 px-4 py-2 rounded-full">
-                            <Info size={14} />
-                            Protocolo de Segurança WeVets
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            <div className={`space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 flex-1 ${isLocked ? 'pointer-events-none select-none grayscale-[0.5] opacity-30 shadow-none overflow-hidden' : ''}`}>
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 flex-1">
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-100 pb-6">
                     <div>
                         <h2 className="text-2xl font-black text-gray-900 flex items-center gap-3">

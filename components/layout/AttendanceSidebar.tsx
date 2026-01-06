@@ -39,14 +39,14 @@ export const AttendanceSidebar: React.FC<AttendanceSidebarProps> = ({ onCancel }
                 <div className="flex items-center gap-2 mb-2">
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${attendance.status === 'INITIATED' ? 'bg-primary-50 text-primary-600 border border-primary-100' :
                         attendance.status === 'FINISHED' ? 'bg-green-50 text-status-success border border-green-100' :
-                            attendance.status === 'IN_PROGRESS' ? 'bg-red-50 text-status-error border border-red-100 flex items-center gap-1.5' :
+                            attendance.status === 'IN_PROGRESS' ? 'bg-blue-50 text-blue-700 border border-blue-100 flex items-center gap-1.5' :
                                 attendance.status === 'SCHEDULED' ? 'bg-amber-50 text-status-warning border border-amber-100' :
                                     'bg-gray-100 text-gray-500 border border-gray-100'
                         }`}>
                         {attendance.status === 'IN_PROGRESS' && (
                             <span className="relative flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-status-error"></span>
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
                             </span>
                         )}
                         {STATUS_LABELS[attendance.status]}

@@ -86,9 +86,11 @@ const App: React.FC = () => {
     const [showFinalizePaidToast, setShowFinalizePaidToast] = useState(false);
 
     // Estado para cancelamento de atendimento
+    // Estado para cancelamento de atendimento
     const [showAttendanceCancelledToast, setShowAttendanceCancelledToast] = useState(false);
     const [showAttendanceFinalizedToast, setShowAttendanceFinalizedToast] = useState(false);
-    const [isPanicMode, setIsPanicMode] = useState(false);
+
+
     const [scheduleSuccessInfo, setScheduleSuccessInfo] = useState<{ date: string, time: string } | null>(null);
     const [scheduledAttendances, setScheduledAttendances] = useState<Attendance[]>([]); // New state for dashboard list
 
@@ -226,62 +228,19 @@ const App: React.FC = () => {
             setActiveModal('petSelection');
         } else {
             // Case 111: Single Pet -> Direct to Attendance
-            if (isPanicMode) {
-                handlePetSelect(pets[0]);
-            } else {
-                startAttendance(pets[0].id, tutor.cpf);
-                setActivePet(pets[0]);
-                setActiveModal('none'); // Close CPF inputs
-                setView('dashboard');
-            }
+            startAttendance(pets[0].id, tutor.cpf);
+            setActivePet(pets[0]);
+            setActiveModal('none'); // Close CPF inputs
+            setView('dashboard');
         }
     };
 
     const handlePetSelect = (pet: Pet) => {
-        if (isPanicMode) {
-            // Panic Flow: Immediate start with Emergency Service
-            const emergencyService: CartItem = {
-                id: 'emergency-001',
-                code: 'EMERGENCY',
-                name: 'Taxa de Emergência (Pronto Socorro)',
-                category: 'Emergência',
-                price: 350.00,
-                copay: 0,
-                tags: [{ label: 'Emergência', type: 'error' }],
-                actionType: 'cart',
-                quantity: 1
-            };
-
-            // Create emergency attendance
-            const newAttendance: Partial<Attendance> = {
-                status: 'IN_PROGRESS',
-                currentStep: 'SERVICES',
-                anamnesis: {
-                    mainComplaint: 'EMERGÊNCIA - PRONTO SOCORRO',
-                    history: { vaccination: { status: 'unknown' } },
-                    vitals: {},
-                    systems: []
-                },
-                services: [emergencyService],
-                schedulingInfo: {
-                    date: new Date().toISOString().split('T')[0],
-                    time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-                    location: 'clinic'
-                }
-            };
-
-            startAttendance(pet.id, MOCK_TUTOR.cpf, newAttendance);
-            setActivePet(pet);
-            setActiveModal('none');
-            setView('dashboard'); // Dashboard view displays clinical layout when attendance is active
-            setIsPanicMode(false); // Reset panic mode
-        } else {
-            // Normal flow
-            startAttendance(pet.id, MOCK_TUTOR.cpf);
-            setActivePet(pet);
-            setActiveModal('none');
-            setView('dashboard');
-        }
+        // Normal flow
+        startAttendance(pet.id, MOCK_TUTOR.cpf);
+        setActivePet(pet);
+        setActiveModal('none');
+        setView('dashboard');
     };
 
     const handleStartAttendanceFromCentral = (attendanceData: Attendance) => {
@@ -439,11 +398,6 @@ const App: React.FC = () => {
                         <AttendanceCentral
                             onStartAttendance={handleStartAttendanceFromCentral}
                             onNewAttendance={() => {
-                                setIsPanicMode(false);
-                                setActiveModal('cpfInput');
-                            }}
-                            onPanic={() => {
-                                setIsPanicMode(true);
                                 setActiveModal('cpfInput');
                             }}
                             extraAttendances={scheduledAttendances}

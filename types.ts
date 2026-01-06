@@ -3,7 +3,7 @@ export interface Service {
   id: string;
   code: string;
   name: string;
-  category: 'Consulta' | 'Vacina' | 'Exame' | 'Cirurgia' | 'Internação' | 'Emergência';
+  category: 'Consulta' | 'Vacina' | 'Exame' | 'Cirurgia' | 'Internação';
   price: number;
   copay: number;
   tags: {
