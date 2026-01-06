@@ -192,6 +192,19 @@ export const SERVICES: Service[] = [
       { label: "Cobertura", type: "success", icon: "check" },
     ]
   },
+  {
+    id: "8",
+    code: "ESP-006",
+    name: "Consulta Especialista - Oncologia",
+    category: "Consulta",
+    price: 300.00,
+    copay: 0.00,
+    actionType: 'internal_only',
+    warning: "Rede credenciada não atende. Apenas Rede Interna.",
+    tags: [
+      { label: "Sem cobertura na Rede Credenciada", type: "error", icon: "x" },
+    ]
+  },
 
   // --- VACINAS ---
   {

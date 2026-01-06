@@ -13,7 +13,7 @@ export interface Service {
   }[];
   warning?: string;
   disabled?: boolean;
-  actionType: 'cart' | 'forward' | 'none' | 'upgrade'; // 'upgrade' offers plan change
+  actionType: 'cart' | 'schedule' | 'quote' | 'none' | 'upgrade' | 'forward' | 'internal_only'; // 'upgrade' offers plan change
 }
 
 export interface CartItem extends Service {
@@ -57,7 +57,7 @@ export interface AttendanceHistoryItem {
   documents?: string[];
 }
 
-export type ModalType = 'none' | 'finalize' | 'schedule' | 'details' | 'search' | 'petSelection' | 'budgetDetails' | 'anamnesis' | 'gracePeriod' | 'confirmBudget' | 'limitExceeded' | 'noCoverage' | 'serviceDetails' | 'cancelAttendance' | 'updateWeight' | 'tutorInfo' | 'upgradePlan' | 'attendanceHistory' | 'cpfInput';
+export type ModalType = 'none' | 'finalize' | 'schedule' | 'details' | 'search' | 'petSelection' | 'budgetDetails' | 'anamnesis' | 'gracePeriod' | 'confirmBudget' | 'limitExceeded' | 'noCoverage' | 'serviceDetails' | 'cancelAttendance' | 'updateWeight' | 'tutorInfo' | 'upgradePlan' | 'attendanceHistory' | 'cpfInput' | 'internalOnlyDetails';
 
 // --- Clinical Attendance Types ---
 

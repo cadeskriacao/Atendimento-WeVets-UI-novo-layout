@@ -772,6 +772,45 @@ export const GracePeriodModal: React.FC<{
     );
 };
 
+export const InternalOnlyDetailsModal: React.FC<{
+    service: Service | null;
+    onClose: () => void;
+    onForward: () => void;
+    onUpgrade: () => void;
+}> = ({ service, onClose, onForward, onUpgrade }) => {
+    if (!service) return null;
+
+    return (
+        <Modal isOpen={true} onClose={onClose} title="Serviço Inelegível">
+            <div className="p-6 pt-2">
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 flex gap-3 items-start">
+                    <div className="bg-amber-100 p-1.5 rounded-full text-amber-600 mt-0.5">
+                        <AlertTriangle size={16} />
+                    </div>
+                    <div>
+                        <h4 className="font-bold text-amber-800 text-sm mb-1">Serviço não coberto pela Rede Credenciada</h4>
+                        <p className="text-amber-700 text-sm">
+                            Este item do plano, <span className="font-bold">{service.name}</span>, é exclusivo para atendimento na Rede Própria (Interna).
+                        </p>
+                    </div>
+                </div>
+
+                <div className="space-y-3">
+                    <Button onClick={onForward} className="w-full bg-primary-600 hover:bg-primary-700 text-white shadow-md">
+                        Realizar Encaminhamento
+                    </Button>
+                    <Button variant="outline" onClick={onUpgrade} className="w-full border-primary-300 text-primary-600 hover:bg-primary-50">
+                        Ofertar Upgrade de Plano
+                    </Button>
+                    <Button variant="ghost" onClick={onClose} className="w-full text-gray-500 hover:text-gray-700">
+                        Voltar
+                    </Button>
+                </div>
+            </div>
+        </Modal>
+    );
+};
+
 export const LimitExceededModal: React.FC<{
     service: Service | null;
     onClose: () => void;

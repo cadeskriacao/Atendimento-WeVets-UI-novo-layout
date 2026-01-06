@@ -9,7 +9,7 @@ interface ServiceListProps {
   onOpenAnamnesis: () => void;
   hasAnamnesis: boolean;
   unlockedServices?: string[]; // IDs of services that had grace period paid or limit bought
-  onServiceClick?: (service: Service, type: 'grace' | 'limit' | 'noCoverage') => void; // Intercept click for special logic
+  onServiceClick?: (service: Service, type: 'grace' | 'limit' | 'noCoverage' | 'internalOnly') => void; // Intercept click for special logic
   onServiceForward?: (service: Service) => void;
 }
 
@@ -37,6 +37,12 @@ export const ServiceList: React.FC<ServiceListProps> = ({
 
   const handleServiceClick = (service: Service) => {
     const isUnlocked = unlockedServices.includes(service.id);
+
+    // Check for Internal Only
+    if (service.actionType === 'internal_only' && onServiceClick) {
+      onServiceClick(service, 'internalOnly');
+      return;
+    }
 
     // Check for Grace Period (Carência) - Error Type
     const hasGracePeriod = service.tags.some(t => t.label.toLowerCase().includes('carência') && t.type === 'error');
@@ -163,6 +169,11 @@ export const ServiceList: React.FC<ServiceListProps> = ({
                 {service.actionType === 'forward' ? (
                   <Button variant="outline" size="sm" onClick={() => onServiceForward && onServiceForward(service)} className="border-primary-200 text-primary-700 hover:bg-primary-50 font-semibold">
                     Encaminhar
+                  </Button>
+                ) : service.actionType === 'internal_only' ? (
+                  <Button variant="outline" size="sm" onClick={() => handleServiceClick(service)} className="border-amber-200 text-amber-700 hover:bg-amber-50 font-semibold gap-2">
+                    <AlertTriangle size={16} />
+                    Inelegível
                   </Button>
                 ) : service.actionType === 'upgrade' ? (
                   <Button variant="outline" size="sm" onClick={() => handleServiceClick(service)} className="border-primary-200 text-primary-700 hover:bg-primary-50 font-semibold">

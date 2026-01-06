@@ -7,7 +7,7 @@ import { CartSidebar } from './components/CartSidebar';
 import { Button, Banner } from './components/ui';
 import { MobileCartBar } from './components/MobileCartBar';
 import { PlanSelection } from './components/PlanSelection';
-import { FinalizeModal, ScheduleModal, SearchModal, PetSelectionModal, BudgetDetailsModal, AnamnesisModal, GracePeriodModal, ConfirmBudgetModal, LimitExceededModal, NoCoverageModal, ServiceDetailsModal, CancelAttendanceModal, UpdateWeightModal, TutorInfoModal, UpgradePlanModal, AttendanceHistoryModal } from './components/Modals';
+import { FinalizeModal, ScheduleModal, SearchModal, PetSelectionModal, BudgetDetailsModal, AnamnesisModal, GracePeriodModal, ConfirmBudgetModal, LimitExceededModal, NoCoverageModal, ServiceDetailsModal, CancelAttendanceModal, UpdateWeightModal, TutorInfoModal, UpgradePlanModal, AttendanceHistoryModal, InternalOnlyDetailsModal } from './components/Modals';
 import { PlanActiveToast, GracePeriodSuccessToast, LimitPurchasedToast, ForwardSuccessToast, UpgradeSuccessToast, FinalizeFeesPaidToast, AttendanceCancelledToast, AttendanceFinalizedToast, ScheduleSuccessToast } from './components/Notifications';
 import { CartItem, ModalType, Service, Pet } from './types';
 import {
@@ -35,7 +35,7 @@ import { mockTutorService } from './services/tutor/MockTutorService'; // Import 
 import { SalesDashboard } from './components/sales/SalesDashboard';
 
 const App: React.FC = () => {
-    const { attendance, startAttendance, cancelAttendance, finishAttendance, setServices: setContextServices, updateTriage, scheduleAttendance, recordBudgetGeneration } = useAttendance();
+    const { attendance, startAttendance, cancelAttendance, finishAttendance, setServices: setContextServices, updateTriage, scheduleAttendance, recordBudgetGeneration, setCurrentStep } = useAttendance();
 
     const [view, setView] = useState<'search' | 'dashboard' | 'planSelection' | 'sales'>('search');
     const [activePet, setActivePet] = useState<Pet | null>(null);
@@ -276,11 +276,12 @@ const App: React.FC = () => {
         setActiveModal('none');
     };
 
-    const handleServiceClick = (service: Service, type: 'grace' | 'limit' | 'noCoverage') => {
+    const handleServiceClick = (service: Service, type: 'grace' | 'limit' | 'noCoverage' | 'internalOnly') => {
         setSelectedServiceForCheck(service);
         if (type === 'grace') setActiveModal('gracePeriod');
         else if (type === 'limit') setActiveModal('limitExceeded');
         else if (type === 'noCoverage') setActiveModal('noCoverage');
+        else if (type === 'internalOnly') setActiveModal('internalOnlyDetails');
     };
 
     const handleServiceForward = (service: Service) => setShowForwardToast(true);
@@ -697,6 +698,7 @@ const App: React.FC = () => {
             {activeModal === 'updateWeight' && activePet && <UpdateWeightModal currentWeight={activePet.weight || '0kg'} onClose={() => setActiveModal('none')} onSave={(newWeight) => { setActivePet(prev => prev ? { ...prev, weight: newWeight + 'kg' } : null); if (isClinicalMode) { updateTriage({ weight: newWeight }); } setActiveModal('none'); }} />}
             {activeModal === 'tutorInfo' && <TutorInfoModal tutor={MOCK_TUTOR} onClose={() => setActiveModal('none')} />}
             {activeModal === 'upgradePlan' && <UpgradePlanModal onClose={() => setActiveModal('none')} />}
+            {activeModal === 'internalOnlyDetails' && <InternalOnlyDetailsModal service={selectedServiceForCheck} onClose={() => setActiveModal('none')} onForward={() => { setActiveModal('none'); handleServiceForward(selectedServiceForCheck!); setCurrentStep('PRESCRIPTION'); }} onUpgrade={() => { setActiveModal('upgradePlan'); }} />}
             {activeModal === 'attendanceHistory' && <AttendanceHistoryModal pet={activePet} onClose={() => setActiveModal('none')} />}
 
         </ClinicalLayout>
