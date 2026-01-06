@@ -7,14 +7,15 @@ interface CartSidebarProps {
     items: CartItem[];
     onUpdateQuantity: (id: string, delta: number) => void;
     onRemove: (id: string) => void;
-    onAction: (action: 'schedule' | 'quote' | 'finalize' | 'cancel') => void;
+    onAction: (action: 'schedule' | 'quote' | 'finalize' | 'cancel' | 'startAttendance') => void;
     isAttendanceMode?: boolean;
     isScheduled?: boolean;
     isInProgress?: boolean;
+    canFinalize?: boolean;
     className?: string; // Allow overrides
 }
 
-export const CartSidebar: React.FC<CartSidebarProps> = ({ items, onUpdateQuantity, onRemove, onAction, isAttendanceMode = false, isScheduled = false, isInProgress = false, className = '' }) => {
+export const CartSidebar: React.FC<CartSidebarProps> = ({ items, onUpdateQuantity, onRemove, onAction, isAttendanceMode = false, isScheduled = false, isInProgress = false, canFinalize = false, className = '' }) => {
     const totalCopay = items.reduce((sum, item) => sum + (item.copay * item.quantity), 0);
     const totalAnticipation = items.reduce((sum, item) => sum + ((item.anticipationFee || 0) * item.quantity), 0);
     const totalLimitFee = items.reduce((sum, item) => sum + ((item.limitFee || 0) * item.quantity), 0);
@@ -23,9 +24,9 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ items, onUpdateQuantit
     const grandTotal = totalCopay + totalAnticipation + totalLimitFee;
     const hasPendingFees = totalAnticipation > 0 || totalLimitFee > 0;
 
-    if (items.length === 0 && isAttendanceMode) {
+    if (items.length === 0 && isAttendanceMode && !isInProgress) {
         return (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 flex flex-col items-center justify-center text-center h-64 transition-all hover:shadow-[0_8px_40px_rgb(0,0,0,0.06)]">
+            <div className={`bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 flex flex-col items-center justify-center text-center h-64 transition-all hover:shadow-[0_8px_40px_rgb(0,0,0,0.06)] ${className}`}>
                 <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
                     <ShoppingCart size={32} className="text-slate-300" />
                 </div>
@@ -35,18 +36,9 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ items, onUpdateQuantit
         );
     }
 
-    // Use default class if no className provided for height, or append. 
-    // Actually, simple append is best. 
-    // But we want to remove max-h if needed. 
-    // Tailwind classes override if placed later? No, not always.
-    // Let's use `bg-white flex flex-col h-full rounded-2xl ...` and keep max-h logic as default if not overridden?
-    // Responsive Tip: The drawer needs h-full. The desktop needs max-h.
-    // Let's just make it h-full and let the container decide?
-    // The previous code had: `max-h-[calc(100vh-140px)]`.
-
     return (
-        <div className={`bg-white flex flex-col h-full rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden ${isAttendanceMode ? 'max-h-[calc(100vh-140px)]' : 'lg:max-h-[calc(100vh-7rem)]'} ${className}`}>
-            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-white flex-shrink-0 z-10 w-full">
+        <div className={`bg-gray-50 flex flex-col h-full rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden ${isAttendanceMode ? 'max-h-[calc(100vh-140px)]' : 'lg:max-h-[calc(100vh-7rem)]'} ${className}`}>
+            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 flex-shrink-0 z-10 w-full">
                 <div className="flex items-center gap-2">
                     <h3 className="font-bold text-gray-900">Checkout</h3>
                     {items.length > 0 && <span className="bg-gray-200 text-gray-700 text-xs font-bold px-2 py-0.5 rounded-full">{totalItems}</span>}
@@ -114,7 +106,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ items, onUpdateQuantit
                 )}
             </div>
 
-            <div className="p-4 border-t border-gray-100 bg-white flex-shrink-0">
+            <div className="p-4 border-t border-gray-100 bg-gray-50 flex-shrink-0">
                 {hasPendingFees && (
                     <div className="mb-4 pb-4 border-b border-gray-100">
                         <div className="flex items-start gap-2 text-orange-500">
@@ -165,23 +157,51 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ items, onUpdateQuantit
                 {/* Action Buttons */}
                 {isAttendanceMode ? (
                     <div className="grid grid-cols-1 gap-3 mt-6">
-                        <Button
-                            variant="outline"
-                            onClick={() => onAction('quote')}
-                            disabled={items.length === 0}
-                            className="w-full text-base py-3 border-primary-600 text-primary-600 hover:bg-primary-50"
-                        >
-                            Gerar Orçamento
-                        </Button>
-                        {!isInProgress && (
-                            <Button
-                                onClick={() => onAction('schedule')}
-                                disabled={items.length === 0}
-                                className="w-full text-base py-3 disabled:opacity-50 shadow-lg shadow-primary-500/10"
-                                isLoading={false}
-                            >
-                                {isScheduled ? 'Alterar data/hora' : 'Agendar serviço'}
-                            </Button>
+                        {!isInProgress ? (
+                            <>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => onAction('quote')}
+                                        disabled={items.length === 0}
+                                        className="w-full text-sm py-2.5 border-primary-200 text-primary-700 hover:bg-primary-50 font-semibold"
+                                    >
+                                        Orçamento
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => onAction('schedule')}
+                                        disabled={items.length === 0}
+                                        className="w-full text-sm py-2.5 border-primary-200 text-primary-700 hover:bg-primary-50 font-semibold"
+                                    >
+                                        Agendar Serviço
+                                    </Button>
+                                </div>
+                                <Button
+                                    onClick={() => onAction('startAttendance')}
+                                    disabled={items.length === 0}
+                                    className="w-full text-base py-3 shadow-lg shadow-primary-500/10 font-bold"
+                                >
+                                    Iniciar Atendimento
+                                </Button>
+                            </>
+                        ) : (
+                            <div className="grid grid-cols-2 gap-3">
+                                <Button
+                                    onClick={() => onAction('finalize')}
+                                    disabled={!canFinalize || items.length === 0}
+                                    className="col-span-1 disabled:opacity-50 font-bold shadow-md"
+                                >
+                                    Finalizar
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    onClick={() => onAction('cancel')}
+                                    className="col-span-1 text-gray-500 hover:text-red-600 hover:bg-red-50 font-medium border border-gray-200"
+                                >
+                                    Cancelar
+                                </Button>
+                            </div>
                         )}
                     </div>
                 ) : (
@@ -199,21 +219,6 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ items, onUpdateQuantit
                             className="col-span-1 border-primary-300 text-primary-600"
                         >
                             Orçamento
-                        </Button>
-                        <Button
-                            variant="outline"
-                            onClick={() => onAction('finalize')}
-                            disabled={items.length === 0 || hasPendingFees}
-                            className="col-span-1 border-primary-300 text-primary-600 disabled:opacity-50"
-                        >
-                            Finalizar
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            onClick={() => onAction('cancel')}
-                            className="col-span-1 text-primary-600 hover:bg-primary-50"
-                        >
-                            Cancelar
                         </Button>
                     </div>
                 )}

@@ -1,6 +1,5 @@
 import { create } from 'zustand';
-
-type ModalType = 'none' | 'finalize' | 'schedule' | 'details' | 'search' | 'petSelection' | 'budgetDetails' | 'anamnesis' | 'gracePeriod' | 'confirmBudget' | 'limitExceeded' | 'noCoverage' | 'serviceDetails' | 'cancelAttendance' | 'updateWeight' | 'tutorInfo' | 'upgradePlan' | 'attendanceHistory' | 'cpfInput';
+import { ModalType } from '../../types';
 
 interface AttendanceUIState {
     activeModal: ModalType;

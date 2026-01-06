@@ -247,7 +247,8 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({ children
 
                 setAttendance({
                     ...attendance,
-                    ...updates
+                    ...updates,
+                    currentStep: 'ANAMNESIS'
                 });
             }
         }}>

@@ -134,6 +134,7 @@ export const ServiceList: React.FC<ServiceListProps> = ({
                 </h4>
 
                 {/* Tags */}
+                {/* Tags & Warning */}
                 <div className="flex flex-wrap items-center gap-2 mt-2">
                   {service.tags.map((tag, idx) => {
                     const isErrorTag = tag.type === 'error';
@@ -155,13 +156,13 @@ export const ServiceList: React.FC<ServiceListProps> = ({
                       </div>
                     )
                   })}
-                </div>
 
-                {service.warning && (
-                  <div className="mt-2 text-xs font-medium text-orange-600 bg-orange-50 px-2 py-1 rounded inline-block">
-                    {service.warning}
-                  </div>
-                )}
+                  {service.warning && (
+                    <div className="text-xs font-medium text-orange-600 border border-orange-100 bg-orange-50 px-2.5 py-1 rounded-md">
+                      {service.warning}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Actions */}

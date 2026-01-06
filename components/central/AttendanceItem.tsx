@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Clock, Calendar, AlertCircle, Play, XCircle, Stethoscope, DollarSign, History } from 'lucide-react';
+import { ChevronDown, ChevronUp, Clock, Calendar, AlertCircle, Play, XCircle, Stethoscope, DollarSign, History, Trash2 } from 'lucide-react';
 import { Button } from '../ui';
 import { Attendance, STATUS_LABELS } from '../../types';
 
@@ -24,13 +24,14 @@ export const AttendanceItem: React.FC<AttendanceItemProps> = ({
         switch (status) {
             case 'SCHEDULED': return 'bg-amber-100 text-amber-800 border-amber-200';
             case 'IN_PROGRESS': return 'bg-blue-100 text-blue-800 border-blue-200';
+            case 'BUDGETING': return 'bg-slate-100 text-slate-800 border-slate-200';
             case 'FINISHED': return 'bg-green-100 text-green-800 border-green-200';
             case 'CANCELLED': return 'bg-gray-100 text-gray-800 border-gray-200';
             default: return 'bg-gray-100 text-gray-800';
         }
     };
 
-    const isActionable = attendance.status === 'SCHEDULED' || attendance.status === 'IN_PROGRESS';
+    const isActionable = attendance.status === 'SCHEDULED' || attendance.status === 'IN_PROGRESS' || attendance.status === 'BUDGETING';
 
     return (
         <div className={`border-b border-gray-100 bg-white transition-all ${isExpanded ? 'bg-gray-100/50' : 'hover:bg-gray-100'}`}>
@@ -166,21 +167,32 @@ export const AttendanceItem: React.FC<AttendanceItemProps> = ({
                     {/* Actions Toolbar */}
                     {isActionable && (
                         <div className="flex flex-col sm:flex-row justify-end gap-3 mt-6">
-                            <Button
-                                variant="outline"
-                                className="text-status-error border-red-200 hover:bg-red-50 hover:border-red-300"
-                                onClick={(e) => { e.stopPropagation(); onCancelAttendance(attendance.id); }}
-                                leftIcon={<XCircle size={18} />}
-                            >
-                                Cancelar Atendimento
-                            </Button>
+                            {attendance.status === 'BUDGETING' ? (
+                                <Button
+                                    variant="outline"
+                                    className="text-gray-500 border-gray-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+                                    onClick={(e) => { e.stopPropagation(); onCancelAttendance(attendance.id); }}
+                                    leftIcon={<Trash2 size={18} />}
+                                >
+                                    Excluir Orçamento
+                                </Button>
+                            ) : (
+                                <Button
+                                    variant="outline"
+                                    className="text-status-error border-red-200 hover:bg-red-50 hover:border-red-300"
+                                    onClick={(e) => { e.stopPropagation(); onCancelAttendance(attendance.id); }}
+                                    leftIcon={<XCircle size={18} />}
+                                >
+                                    Cancelar Atendimento
+                                </Button>
+                            )}
                             <Button
                                 variant="primary"
                                 className="bg-primary-600 hover:bg-primary-700 shadow-md shadow-primary-500/20"
                                 onClick={(e) => { e.stopPropagation(); onStartAttendance(attendance.id); }}
                                 leftIcon={<Play size={18} />}
                             >
-                                {attendance.status === 'SCHEDULED' ? 'Iniciar Triagem' : 'Continuar Atendimento'}
+                                {attendance.status === 'SCHEDULED' ? 'Iniciar Triagem' : attendance.status === 'BUDGETING' ? 'Editar Orçamento' : 'Continuar Atendimento'}
                             </Button>
                         </div>
                     )}

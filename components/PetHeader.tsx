@@ -113,15 +113,16 @@ export const PetHeader: React.FC<PetHeaderProps> = ({
                             <div className={`${isTutorExpanded ? 'flex' : 'hidden'} xl:flex flex-col gap-2 animate-in fade-in slide-in-from-top-1 duration-200`}>
                                 <div className="flex flex-col gap-0.5">
                                     <div className="hidden xl:block text-[10px] text-gray-400 font-bold uppercase tracking-widest">Tutor(a)</div>
-                                    <div className="font-bold text-gray-800 text-sm flex items-center justify-between">
-                                        <span className="truncate max-w-[150px]">{tutor.name}</span>
+                                    <div className="font-bold text-gray-800 text-sm flex items-center justify-between gap-2">
+                                        <span className="truncate flex-1" title={tutor.name}>{tutor.name}</span>
                                         <Button
                                             variant="ghost"
                                             size="sm"
                                             onClick={onTutorInfoClick}
-                                            className="h-5 px-1.5 text-[10px] font-bold text-primary-600 hover:text-primary-800 hover:bg-primary-50 rounded"
+                                            className="flex-shrink-0 h-6 pl-1.5 pr-2.5 text-[10px] font-bold text-primary-700 bg-primary-50 hover:bg-primary-100 rounded-full flex items-center gap-1 transition-colors"
                                         >
-                                            +
+                                            <span className="text-sm leading-none">+</span>
+                                            <span>Info</span>
                                         </Button>
                                     </div>
                                     <div className="text-xs text-gray-400 mt-0.5">

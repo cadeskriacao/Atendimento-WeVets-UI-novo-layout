@@ -35,7 +35,7 @@ import { mockTutorService } from './services/tutor/MockTutorService'; // Import 
 import { SalesDashboard } from './components/sales/SalesDashboard';
 
 const App: React.FC = () => {
-    const { attendance, startAttendance, cancelAttendance, finishAttendance, setServices: setContextServices, updateTriage, scheduleAttendance, recordBudgetGeneration, setCurrentStep } = useAttendance();
+    const { attendance, startAttendance, cancelAttendance, finishAttendance, setServices: setContextServices, updateTriage, scheduleAttendance, recordBudgetGeneration, setCurrentStep, canFinalize, startMedicalAttendance } = useAttendance();
 
     const [view, setView] = useState<'search' | 'dashboard' | 'planSelection' | 'sales'>('search');
     const [activePet, setActivePet] = useState<Pet | null>(null);
@@ -131,13 +131,15 @@ const App: React.FC = () => {
         updateCart(newItems);
     };
 
-    const handleCartAction = (action: 'schedule' | 'quote' | 'finalize' | 'cancel') => {
+    const handleCartAction = (action: 'schedule' | 'quote' | 'finalize' | 'cancel' | 'startAttendance') => {
         if (action === 'finalize') {
             setActiveModal('finalize');
         } else if (action === 'schedule') {
             setActiveModal('schedule');
         } else if (action === 'quote') {
             setActiveModal('confirmBudget');
+        } else if (action === 'startAttendance') {
+            startMedicalAttendance();
         } else if (action === 'cancel') {
             if (isClinicalMode) {
                 setActiveModal('cancelAttendance');
@@ -378,6 +380,34 @@ const App: React.FC = () => {
         }, 100);
     };
 
+    const handleSaveBudget = () => {
+        if (activePet) {
+            const budgetId = `bud-${Date.now()}`;
+            const newBudget: Attendance = {
+                id: budgetId,
+                petId: activePet.id,
+                tutorId: MOCK_TUTOR.cpf,
+                status: 'BUDGETING',
+                currentStep: 'SERVICES',
+                triage: { weight: activePet.weight },
+                anamnesis: { mainComplaint: '', history: { vaccination: { status: 'unknown' } }, vitals: {}, systems: [] },
+                services: [...cartItems],
+                prescriptions: [],
+                schedulingInfo: { date: new Date().toISOString().split('T')[0], time: '12:00', location: 'clinic' },
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+
+            setScheduledAttendances(prev => [newBudget, ...prev]);
+        }
+
+        setActiveModal('none');
+        updateCart([]);
+        setActivePet(null);
+        setView('search');
+        resetState();
+    };
+
 
 
     if (view === 'search') {
@@ -498,6 +528,7 @@ const App: React.FC = () => {
                         isAttendanceMode={isClinicalMode}
                         isScheduled={attendance?.status === 'SCHEDULED'}
                         isInProgress={attendance?.status === 'IN_PROGRESS'}
+                        canFinalize={canFinalize}
                     />
                 ) : null
             }
@@ -539,8 +570,6 @@ const App: React.FC = () => {
                 </>
             }
             banner={null}
-            onCancelAttendance={handleCancelAttendance}
-            onFinalizeAttendance={() => setActiveModal('finalize')}
             overlay={
                 isDelinquent && !isPlanReactivated && (
                     <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-[2px] transition-all duration-500">
@@ -631,6 +660,7 @@ const App: React.FC = () => {
                                 isAttendanceMode={isClinicalMode}
                                 isScheduled={attendance?.status === 'SCHEDULED'}
                                 isInProgress={attendance?.status === 'IN_PROGRESS'}
+                                canFinalize={canFinalize}
                                 className="max-h-full border-0 shadow-none bg-transparent"
                             />
                         </div>
@@ -674,23 +704,39 @@ const App: React.FC = () => {
             {/* Modals */}
             {activeModal === 'finalize' && <FinalizeModal items={cartItems} onClose={() => setActiveModal('none')} onConfirm={handleAttendanceFinish} isAttendanceMode={isClinicalMode} isFeesPaid={isFinalizeFeesPaid} onCancelProcess={() => setActiveModal('none')} />}
             {activeModal === 'cancelAttendance' && attendance && <CancelAttendanceModal attendance={attendance} onClose={() => setActiveModal('none')} onConfirm={handleConfirmCancellation} />}
-            {activeModal === 'schedule' && <ScheduleModal onClose={() => setActiveModal('none')} onConfirm={isClinicalMode ? (data) => {
-                scheduleAttendance(data);
-                // Add to local list for dashboard visibility
-                if (attendance) {
+            {activeModal === 'schedule' && <ScheduleModal onClose={() => setActiveModal('none')} onConfirm={(data) => {
+                if (isClinicalMode) {
+                    scheduleAttendance(data);
+                    if (attendance) {
+                        setScheduledAttendances(prev => [{ ...attendance, status: 'SCHEDULED', schedulingInfo: data, updatedAt: new Date().toISOString() }, ...prev]);
+                    }
+                } else if (activePet) {
                     const scheduledAtt: Attendance = {
-                        ...attendance,
+                        id: `sch-${Date.now()}`,
+                        petId: activePet.id,
+                        tutorId: MOCK_TUTOR.cpf,
                         status: 'SCHEDULED',
+                        currentStep: 'SERVICES',
+                        triage: { weight: activePet.weight },
+                        anamnesis: { mainComplaint: '', history: { vaccination: { status: 'unknown' } }, vitals: {}, systems: [] },
+                        services: [...cartItems],
+                        prescriptions: [],
                         schedulingInfo: data,
+                        createdAt: new Date().toISOString(),
                         updatedAt: new Date().toISOString()
                     };
                     setScheduledAttendances(prev => [scheduledAtt, ...prev]);
                 }
+
                 setScheduleSuccessInfo({ date: data.date, time: data.time });
                 setActiveModal('none');
-            } : hasSavedBudget ? handleConfirmBudgetSchedule : undefined} />}
+                updateCart([]);
+                setActivePet(null);
+                setView('search');
+                resetState();
+            }} />}
             {activeModal === 'budgetDetails' && <BudgetDetailsModal onClose={() => setActiveModal('none')} onSchedule={handleScheduleFromBudget} />}
-            {activeModal === 'confirmBudget' && <ConfirmBudgetModal items={cartItems} onClose={() => setActiveModal('none')} onConfirm={handleConfirmBudget} isAttendanceMode={isClinicalMode} />}
+            {activeModal === 'confirmBudget' && <ConfirmBudgetModal items={cartItems} onClose={() => setActiveModal('none')} onConfirm={handleConfirmBudget} onSave={handleSaveBudget} isAttendanceMode={isClinicalMode} />}
             {activeModal === 'gracePeriod' && <GracePeriodModal service={selectedServiceForCheck} onClose={() => setActiveModal('none')} onAddToBudget={handleGracePeriodAddToBudget} />}
             {activeModal === 'limitExceeded' && <LimitExceededModal service={selectedServiceForCheck} onClose={() => setActiveModal('none')} onAddToBudget={handleLimitExceededAddToBudget} />}
             {activeModal === 'noCoverage' && <NoCoverageModal service={selectedServiceForCheck} onClose={() => setActiveModal('none')} />}

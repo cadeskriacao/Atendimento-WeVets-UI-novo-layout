@@ -61,7 +61,7 @@ export type ModalType = 'none' | 'finalize' | 'schedule' | 'details' | 'search' 
 
 // --- Clinical Attendance Types ---
 
-export type AttendanceStatus = 'INITIATED' | 'BUDGET_SENT' | 'IN_PROGRESS' | 'FINISHED' | 'CANCELLED' | 'SCHEDULED';
+export type AttendanceStatus = 'INITIATED' | 'BUDGET_SENT' | 'IN_PROGRESS' | 'FINISHED' | 'CANCELLED' | 'SCHEDULED' | 'BUDGETING';
 
 export const STATUS_LABELS: Record<AttendanceStatus, string> = {
   INITIATED: 'Iniciado',
@@ -69,7 +69,8 @@ export const STATUS_LABELS: Record<AttendanceStatus, string> = {
   IN_PROGRESS: 'Em atendimento médico',
   FINISHED: 'Finalizado',
   CANCELLED: 'Cancelado',
-  SCHEDULED: 'Agendado'
+  SCHEDULED: 'Agendado',
+  BUDGETING: 'Em orçamento'
 };
 
 export type AttendanceStep = 'ANAMNESIS' | 'SERVICES' | 'PRESCRIPTION' | 'SUMMARY';

@@ -10,8 +10,6 @@ interface ClinicalLayoutProps {
     header?: ReactNode; // New prop for full-width header content
     banner?: ReactNode;
     overlay?: ReactNode; // New prop for overlays (e.g., blockers) that sit below the main header
-    onCancelAttendance?: () => void;
-    onFinalizeAttendance?: () => void;
     hideSidebar?: boolean; // Prop kept for compatibility but left sidebar is removed
 }
 
@@ -22,8 +20,6 @@ export const ClinicalLayout: React.FC<ClinicalLayoutProps> = ({
     header,
     banner,
     overlay,
-    onCancelAttendance,
-    onFinalizeAttendance,
     hideSidebar = false
 }) => {
     return (
@@ -47,9 +43,9 @@ export const ClinicalLayout: React.FC<ClinicalLayoutProps> = ({
 
                     {/* Unified Clinical Content Card */}
                     <div className="flex-1 overflow-hidden p-3 pt-3 pb-2 md:pb-16 flex flex-col">
-                        <div className="w-full flex-1 flex flex-col bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-gray-200 overflow-hidden">
+                        <div className="w-full flex-1 flex flex-col bg-gray-50 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-gray-200 overflow-hidden">
                             {/* Horizontal Tabs Navigation (Header of the Card) */}
-                            {header && <AttendanceTabs onCancel={onCancelAttendance} onFinalize={onFinalizeAttendance} />}
+                            {header && <AttendanceTabs />}
 
                             {/* Scrollable Content (Body of the Card) */}
                             <div className="flex-1 overflow-y-auto custom-scrollbar p-6 bg-slate-50/30">
@@ -69,7 +65,7 @@ export const ClinicalLayout: React.FC<ClinicalLayoutProps> = ({
                 )}
             </div>
 
-            {!hideSidebar && <ClinicalStatusBar />}
+            {/* {!hideSidebar && <ClinicalStatusBar />} */}
         </div>
     );
 };

@@ -1,15 +1,12 @@
 import React from 'react';
-import { FileText, ShoppingCart, CheckCircle, Flag, Circle } from 'lucide-react';
+import { FileText, ShoppingCart, CheckCircle, Circle, AlertCircle } from 'lucide-react';
 import { useAttendance } from '../../contexts/AttendanceContext';
-import { AttendanceStep } from '../../types';
+import { AttendanceStep, STATUS_LABELS } from '../../types';
 
-interface AttendanceTabsProps {
-    onCancel?: () => void;
-    onFinalize?: () => void;
-}
+interface AttendanceTabsProps { }
 
-export const AttendanceTabs: React.FC<AttendanceTabsProps> = ({ onCancel, onFinalize }) => {
-    const { attendance, setCurrentStep, startMedicalAttendance, finishAttendance, cancelAttendance } = useAttendance();
+export const AttendanceTabs: React.FC<AttendanceTabsProps> = () => {
+    const { attendance, setCurrentStep } = useAttendance();
 
     if (!attendance) return null;
 
@@ -32,7 +29,7 @@ export const AttendanceTabs: React.FC<AttendanceTabsProps> = ({ onCancel, onFina
     };
 
     return (
-        <div className="w-full bg-white flex flex-col md:flex-row items-center justify-between px-2 md:px-6 py-2 md:py-3 border-b border-gray-200">
+        <div className="w-full bg-white flex flex-col md:flex-row items-center justify-between px-2 md:px-6 py-2 md:py-3 border-b border-gray-200 gap-4">
             {/* Tabs Navigation */}
             <nav className="flex items-center gap-2 w-full md:w-auto overflow-x-auto no-scrollbar pb-1 md:pb-0">
                 {steps.map((step) => {
@@ -58,64 +55,10 @@ export const AttendanceTabs: React.FC<AttendanceTabsProps> = ({ onCancel, onFina
                 })}
             </nav>
 
-            {/* Desktop Actions Toolbar */}
-            <div className="hidden md:flex items-center gap-2 w-full md:w-auto justify-between md:justify-start mt-3 pt-3 border-t border-gray-100 md:mt-0 md:pt-0 md:border-t-0 md:border-l md:pl-4">
-                {attendance.status === 'IN_PROGRESS' ? (
-                    <button
-                        onClick={onFinalize || finishAttendance}
-                        className="px-4 py-2 bg-status-success hover:bg-green-700 text-white font-bold rounded-lg text-sm shadow-sm transition-all flex items-center gap-2 whitespace-nowrap"
-                    >
-                        <Flag size={16} />
-                        <span>Finalizar</span>
-                    </button>
-                ) : (attendance.status === 'SCHEDULED' || attendance.status === 'INITIATED') ? (
-                    <button
-                        onClick={startMedicalAttendance}
-                        className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-lg text-sm shadow-sm transition-all flex items-center gap-2 whitespace-nowrap"
-                    >
-                        <Flag size={16} />
-                        <span>Iniciar Atendimento</span>
-                    </button>
-                ) : null}
-
-                {(attendance.status === 'SCHEDULED' || attendance.status === 'IN_PROGRESS' || attendance.status === 'INITIATED') && (
-                    <button
-                        onClick={onCancel || cancelAttendance}
-                        className="px-3 py-2 text-status-error hover:bg-red-50 font-medium rounded-lg text-sm transition-colors whitespace-nowrap"
-                    >
-                        Cancelar
-                    </button>
-                )}
-            </div>
-
-            {/* Mobile Actions Toolbar (Fixed Bottom) */}
-            <div className="md:hidden fixed bottom-0 left-0 right-0 p-3 bg-white border-t border-gray-200 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] flex items-center gap-3 z-50">
-                {(attendance.status === 'SCHEDULED' || attendance.status === 'IN_PROGRESS' || attendance.status === 'INITIATED') && (
-                    <button
-                        onClick={onCancel || cancelAttendance}
-                        className="flex-1 py-3 text-status-error bg-red-50 hover:bg-red-100 font-bold rounded-xl text-sm transition-colors whitespace-nowrap border border-red-100"
-                    >
-                        Cancelar
-                    </button>
-                )}
-
-                {attendance.status === 'IN_PROGRESS' ? (
-                    <button
-                        onClick={onFinalize || finishAttendance}
-                        className="flex-[2] py-3 bg-status-success hover:bg-green-700 text-white font-bold rounded-xl text-sm shadow-lg transition-all flex items-center justify-center gap-2 whitespace-nowrap"
-                    >
-                        <Flag size={18} />
-                        <span>Finalizar</span>
-                    </button>
-                ) : (attendance.status === 'SCHEDULED' || attendance.status === 'INITIATED') ? (
-                    <button
-                        onClick={startMedicalAttendance}
-                        className="flex-[2] py-3 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-xl text-sm shadow-lg transition-all flex items-center justify-center gap-2 whitespace-nowrap"
-                    >
-                        <Flag size={18} />
-                        <span>Iniciar Atendimento</span>
-                    </button>
-                ) : null}
+            {/* Status Badge */}
+            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-100">
+                <AlertCircle size={14} />
+                <span className="text-[10px] font-bold uppercase tracking-wide">Status: {STATUS_LABELS[attendance.status]}</span>
             </div>
         </div>
     );

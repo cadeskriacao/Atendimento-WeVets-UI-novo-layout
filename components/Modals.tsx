@@ -138,8 +138,9 @@ export const ConfirmBudgetModal: React.FC<{
     items: CartItem[];
     onClose: () => void;
     onConfirm: () => void;
+    onSave?: () => void;
     isAttendanceMode?: boolean;
-}> = ({ items, onClose, onConfirm, isAttendanceMode = false }) => {
+}> = ({ items, onClose, onConfirm, onSave, isAttendanceMode = false }) => {
     const totalServices = items.reduce((acc, item) => acc + item.quantity, 0);
     const totalValue = items.reduce((acc, item) => acc + (item.copay * item.quantity) + ((item.anticipationFee || 0) * item.quantity) + ((item.limitFee || 0) * item.quantity), 0);
 
@@ -164,30 +165,35 @@ export const ConfirmBudgetModal: React.FC<{
             </div>
 
             <div className="px-6 py-4 max-h-[40vh] overflow-y-auto">
-                {items.map(item => (
-                    <div key={item.id} className="mb-6 last:mb-0">
-                        <p className="text-xs text-gray-500 mb-1">{item.code}</p>
-                        <h4 className="font-bold text-gray-800 text-base mb-3">{item.name}</h4>
-                        <div className="space-y-2 bg-gray-100 p-3 rounded-md border border-gray-100">
-                            {item.anticipationFee ? (
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-gray-600">Antecipação</span>
-                                    <span className="font-medium text-gray-800">R$ {(item.anticipationFee * item.quantity).toFixed(2).replace('.', ',')}</span>
-                                </div>
-                            ) : null}
-                            {item.limitFee ? (
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-gray-600">Compra de limite</span>
-                                    <span className="font-medium text-gray-800">R$ {(item.limitFee * item.quantity).toFixed(2).replace('.', ',')}</span>
-                                </div>
-                            ) : null}
-                            <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">Coparticipação</span>
-                                <span className="font-medium text-gray-800">R$ {(item.copay * item.quantity).toFixed(2).replace('.', ',')}</span>
-                            </div>
-                        </div>
-                    </div>
-                ))}
+                <table className="w-full text-sm text-left border-collapse">
+                    <thead className="text-xs text-gray-500 uppercase bg-gray-50 sticky top-0">
+                        <tr>
+                            <th className="px-3 py-3 font-semibold rounded-tl-lg rounded-bl-lg">Serviço</th>
+                            <th className="px-3 py-3 font-semibold text-center">Qtd</th>
+                            <th className="px-3 py-3 font-semibold text-right rounded-tr-lg rounded-br-lg">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                        {items.map(item => {
+                            const itemTotal = (item.copay + (item.anticipationFee || 0) + (item.limitFee || 0)) * item.quantity;
+
+                            return (
+                                <tr key={item.id} className="hover:bg-gray-50/50 transition-colors group">
+                                    <td className="px-3 py-3">
+                                        <div className="font-bold text-gray-800 leading-tight">{item.name}</div>
+                                        <div className="text-[10px] text-gray-400 font-mono mt-1">{item.code}</div>
+                                    </td>
+                                    <td className="px-3 py-3 text-center text-gray-600 font-medium whitespace-nowrap">
+                                        {item.quantity}x
+                                    </td>
+                                    <td className="px-3 py-3 text-right font-bold text-gray-800 whitespace-nowrap">
+                                        R$ {itemTotal.toFixed(2).replace('.', ',')}
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
             </div>
 
             <div className="px-6 py-5 bg-gray-100 border-t border-gray-100">
@@ -199,13 +205,22 @@ export const ConfirmBudgetModal: React.FC<{
                     Observação: Os valores apresentados são estimativas. Valores finais podem variar de acordo com a execução dos serviços.
                 </p>
 
-                <div className="flex gap-3">
-                    <button onClick={onClose} className="flex-1 bg-white border border-primary-300 text-primary-600 font-bold py-3 rounded-md hover:bg-primary-50 transition-colors">
-                        Voltar
+                <div className="flex flex-col sm:flex-row gap-3">
+                    <button onClick={onSave || onClose} className="flex-1 bg-white border border-primary-300 text-primary-600 font-bold py-3 rounded-md hover:bg-primary-50 transition-colors">
+                        Salvar orçamento
                     </button>
+
+                    <button
+                        onClick={() => alert('Orçamento enviado via WhatsApp!')}
+                        className="flex-1 bg-green-600 text-white border border-transparent font-bold py-3 rounded-md hover:bg-green-700 transition-colors flex items-center justify-center gap-2 shadow-sm"
+                    >
+                        <MessageCircle size={18} />
+                        <span className="whitespace-nowrap">Enviar no WhatsApp</span>
+                    </button>
+
                     {!isAttendanceMode && (
                         <button onClick={onConfirm} className="flex-1 bg-primary-600 text-white font-bold py-3 rounded-md hover:bg-primary-700 transition-colors shadow-sm">
-                            Confirmar e enviar
+                            Confirmar
                         </button>
                     )}
                 </div>
