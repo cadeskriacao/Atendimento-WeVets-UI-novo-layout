@@ -1460,7 +1460,7 @@ export const AttendanceHistoryModal: React.FC<AttendanceHistoryModalProps> = ({ 
                                             <div className="space-y-6">
                                                 {item.diagnosis && (
                                                     <div className="bg-gray-100 rounded-lg p-4 border border-gray-100">
-                                                        <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Diagnóstico (Queixa Principal)</h4>
+                                                        <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Anamnese (Queixa e Diagnóstico)</h4>
                                                         <p className="text-gray-800 leading-relaxed font-medium">{item.diagnosis}</p>
                                                     </div>
                                                 )}
@@ -1468,23 +1468,27 @@ export const AttendanceHistoryModal: React.FC<AttendanceHistoryModalProps> = ({ 
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                     {item.treatment && (
                                                         <div>
-                                                            <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Conduta</h4>
+                                                            <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Encaminhamentos e Prescrições</h4>
                                                             <p className="text-gray-700 leading-relaxed text-sm bg-white p-3 rounded-lg border border-gray-100">{item.treatment}</p>
                                                         </div>
                                                     )}
 
-                                                    {/* Tags */}
-                                                    <div>
-                                                        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Observações Importantes</h4>
-                                                        <div className="flex flex-wrap gap-2">
-                                                            {/* Mock Tags just for display */}
-                                                            {['Castrado', 'V10 - 2024', 'Vermifugado', 'Alergia a Frango'].map(tag => (
-                                                                <span key={tag} className={`px-3 py-1 rounded-full text-xs font-bold border ${getTagStyle(tag)}`}>
-                                                                    {tag}
-                                                                </span>
-                                                            ))}
+
+
+                                                    {/* Services - NEW SECTION */}
+                                                    {item.services && item.services.length > 0 && (
+                                                        <div className="md:col-span-2">
+                                                            <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Serviços Realizados</h4>
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {item.services.map((service, idx) => (
+                                                                    <span key={idx} className="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-lg text-xs font-bold border border-emerald-100 flex items-center gap-1.5">
+                                                                        <CheckCircle2 size={12} className="text-emerald-500" />
+                                                                        {service}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
                                                         </div>
-                                                    </div>
+                                                    )}
                                                 </div>
 
                                                 {item.documents && item.documents.length > 0 && (
