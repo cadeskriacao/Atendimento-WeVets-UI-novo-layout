@@ -31,7 +31,7 @@ export const ClinicalLayout: React.FC<ClinicalLayoutProps> = ({
                 {overlay}
 
                 {/* Main Body Area */}
-                <main className="flex-1 min-w-0 bg-slate-50/50 flex flex-col overflow-hidden relative">
+                <main className="flex-1 min-w-0 flex flex-col overflow-hidden relative">
                     {/* PetHeader Area (FIXED) */}
                     {header && (
                         <div className="w-full z-[60] px-3 mt-3 flex-shrink-0">
@@ -42,13 +42,13 @@ export const ClinicalLayout: React.FC<ClinicalLayoutProps> = ({
                     )}
 
                     {/* Unified Clinical Content Card */}
-                    <div className="flex-1 overflow-hidden p-3 pt-3 pb-2 md:pb-16 flex flex-col">
+                    <div className="flex-1 overflow-hidden pt-3 px-3 pb-[16px] flex flex-col">
                         <div className="w-full flex-1 flex flex-col bg-gray-50 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-gray-200 overflow-hidden">
                             {/* Horizontal Tabs Navigation (Header of the Card) */}
                             {header && <AttendanceTabs />}
 
                             {/* Scrollable Content (Body of the Card) */}
-                            <div className="flex-1 overflow-y-auto custom-scrollbar p-6 bg-slate-50/30">
+                            <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
                                 {children}
                             </div>
                         </div>
@@ -57,7 +57,7 @@ export const ClinicalLayout: React.FC<ClinicalLayoutProps> = ({
 
                 {/* Right Sidebar - Checkout (FIXED) */}
                 {rightSidebar && (
-                    <aside className="hidden xl:flex w-[380px] flex-shrink-0 flex-col h-full overflow-hidden p-3 pl-1 z-10">
+                    <aside className="hidden xl:flex w-[380px] flex-shrink-0 flex-col h-full overflow-hidden pt-3 pr-3 pb-[16px] pl-1 z-10">
                         <div className="h-full w-full">
                             {rightSidebar}
                         </div>

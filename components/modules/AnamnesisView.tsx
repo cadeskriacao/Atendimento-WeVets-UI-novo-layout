@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAttendance } from '../../contexts/AttendanceContext';
-import { FileText, Thermometer, Mic, Heart, AlertCircle, Check, ChevronDown, ChevronUp, Syringe, Home, Utensils, Activity, AlertTriangle, ShieldCheck, Upload, Paperclip } from 'lucide-react';
+import { FileText, Thermometer, Mic, Heart, Trash2, Check, ChevronDown, ChevronUp, Syringe, Home, Utensils, Activity, AlertTriangle, ShieldCheck, Upload, Paperclip, Eye, X } from 'lucide-react';
 import { SystemReview } from '../../types';
 import { Button, Input } from '../ui';
 
@@ -17,6 +17,7 @@ const SYSTEMS_LIST = [
 export const AnamnesisView: React.FC = () => {
     const { attendance, updateAnamnesis } = useAttendance();
     const [expandedSystem, setExpandedSystem] = useState<string | null>(null);
+    const [previewAttachment, setPreviewAttachment] = useState<string | null>(null);
 
     if (!attendance) return null;
 
@@ -115,11 +116,18 @@ export const AnamnesisView: React.FC = () => {
                                     <input
                                         type="file"
                                         className="hidden"
+                                        accept="image/*,.pdf"
                                         onChange={(e) => {
                                             const file = e.target.files?.[0];
                                             if (file) {
-                                                const current = anamnesis.attachments || [];
-                                                updateAnamnesis({ attachments: [...current, file.name] });
+                                                const reader = new FileReader();
+                                                reader.onload = (event) => {
+                                                    const base64 = event.target?.result as string;
+                                                    const current = anamnesis.attachments || [];
+                                                    // Storing as "filename|base64" to keep both pieces of info in the simple string array
+                                                    updateAnamnesis({ attachments: [...current, `${file.name}|${base64}`] });
+                                                };
+                                                reader.readAsDataURL(file);
                                             }
                                         }}
                                     />
@@ -142,25 +150,83 @@ export const AnamnesisView: React.FC = () => {
                         {anamnesis.attachments && anamnesis.attachments.length > 0 && (
                             <div className="px-4 py-3 bg-gray-100/50 border-t border-gray-50">
                                 <div className="flex flex-wrap gap-2">
-                                    {anamnesis.attachments.map((file, idx) => (
-                                        <div key={idx} className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-2.5 py-1.5 shadow-sm animate-in zoom-in-95 duration-200">
-                                            <Paperclip size={12} className="text-gray-400" />
-                                            <span className="text-[11px] font-medium text-gray-600 max-w-[150px] truncate">{file}</span>
-                                            <button
-                                                onClick={() => {
-                                                    const filtered = anamnesis.attachments?.filter((_, i) => i !== idx);
-                                                    updateAnamnesis({ attachments: filtered });
-                                                }}
-                                                className="ml-1 text-gray-300 hover:text-red-500 transition-colors"
-                                            >
-                                                <AlertCircle size={14} />
-                                            </button>
-                                        </div>
-                                    ))}
+                                    {anamnesis.attachments.map((fileEntry, idx) => {
+                                        // Handle legacy strings vs new format
+                                        const [fileName] = fileEntry.includes('|data:') ? fileEntry.split('|') : [fileEntry];
+
+                                        return (
+                                            <div key={idx} className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-2.5 py-1.5 shadow-sm animate-in zoom-in-95 duration-200 group">
+                                                <Paperclip size={12} className="text-gray-400" />
+                                                <span className="text-[11px] font-medium text-gray-600 max-w-[150px] truncate">{fileName}</span>
+                                                <div className="flex items-center gap-1 border-l border-gray-100 pl-2 ml-1">
+                                                    <button
+                                                        onClick={() => setPreviewAttachment(fileEntry)}
+                                                        className="p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-primary-600 transition-colors"
+                                                        title="Visualizar"
+                                                    >
+                                                        <Eye size={12} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            const filtered = anamnesis.attachments?.filter((_, i) => i !== idx);
+                                                            updateAnamnesis({ attachments: filtered });
+                                                        }}
+                                                        className="p-1 hover:bg-red-50 rounded text-gray-300 hover:text-red-500 transition-colors"
+                                                        title="Excluir"
+                                                    >
+                                                        <Trash2 size={12} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         )}
                     </div>
+
+                    {/* Preview Modal */}
+                    {previewAttachment && (
+                        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+                            <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+                                <div className="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50">
+                                    <h3 className="font-bold text-gray-800 truncate pr-4">
+                                        {previewAttachment.includes('|data:') ? previewAttachment.split('|')[0] : previewAttachment}
+                                    </h3>
+                                    <button
+                                        onClick={() => setPreviewAttachment(null)}
+                                        className="p-2 hover:bg-gray-200 rounded-full text-gray-500 transition-colors"
+                                    >
+                                        <X size={20} />
+                                    </button>
+                                </div>
+                                <div className="flex-1 overflow-auto p-4 bg-gray-100 flex items-center justify-center">
+                                    {(() => {
+                                        const isDataUrl = previewAttachment.includes('|data:');
+                                        const [fileName, fileUrl] = isDataUrl ? previewAttachment.split('|') : [previewAttachment, null];
+                                        const isImage = (fileName.match(/\.(jpg|jpeg|png|gif|webp)$/i) || fileUrl?.startsWith('data:image'));
+
+                                        if (isImage) {
+                                            return (
+                                                <img
+                                                    src={fileUrl || "/placeholder-image.jpg"}
+                                                    alt={fileName}
+                                                    className="max-w-full max-h-full object-contain rounded shadow-sm"
+                                                />
+                                            );
+                                        }
+
+                                        return (
+                                            <div className="flex flex-col items-center justify-center text-gray-400 gap-4 py-12">
+                                                <FileText size={48} />
+                                                <p className="text-sm font-medium">Visualização não disponível para este formato</p>
+                                            </div>
+                                        );
+                                    })()}
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* 2. Systems Review - HIDDEN BY USER REQUEST */}
                 </div>

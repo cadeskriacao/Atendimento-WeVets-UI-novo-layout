@@ -74,8 +74,8 @@ export const ServiceList: React.FC<ServiceListProps> = ({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+    <div className="space-y-3">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-2 gap-4">
         <div>
           <h3 className="text-xl font-bold text-gray-900 tracking-tight">Selecione o serviço</h3>
           <p className="text-sm text-gray-500">Busque por nome, código ou filtre por categoria</p>
@@ -97,7 +97,7 @@ export const ServiceList: React.FC<ServiceListProps> = ({
       </div>
 
       {/* Categories */}
-      <div className="flex gap-2 border-b border-gray-100 mb-6 overflow-x-auto pb-4 scrollbar-hide">
+      <div className="flex gap-2 mb-0 overflow-x-auto pb-4 scrollbar-hide">
         {CATEGORIES.map(cat => (
           <button
             key={cat.id}

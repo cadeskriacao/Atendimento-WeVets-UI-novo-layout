@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trash2, Plus, Minus, ShoppingCart, AlertCircle } from 'lucide-react';
+import { Trash2, Plus, Minus, ShoppingCart, AlertCircle, FileText, Calendar, Play, CheckCircle, X } from 'lucide-react';
 import { CartItem } from '../types';
 import { Button } from './ui';
 
@@ -30,7 +30,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ items, onUpdateQuantit
                 <div className="flex items-center gap-2 mb-3 px-1">
                     <h3 className="font-bold text-gray-900 text-lg">Orçamento</h3>
                 </div>
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 flex flex-col items-center justify-center text-center h-64 transition-all hover:shadow-[0_8px_40px_rgb(0,0,0,0.06)]">
+                <div className="bg-white rounded-2xl border border-gray-200 p-8 flex flex-col items-center justify-center text-center h-64 transition-all hover:shadow-[0_8px_40px_rgb(0,0,0,0.06)]">
                     <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
                         <ShoppingCart size={32} className="text-slate-300" />
                     </div>
@@ -42,7 +42,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ items, onUpdateQuantit
     }
 
     return (
-        <div className={`bg-gray-50 flex flex-col h-full rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden ${isAttendanceMode ? 'max-h-[calc(100vh-140px)]' : 'lg:max-h-[calc(100vh-7rem)]'} ${className}`}>
+        <div className={`bg-white flex flex-col h-full rounded-2xl border border-gray-200 overflow-hidden ${className}`}>
             <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 flex-shrink-0 z-10 w-full">
                 <div className="flex items-center gap-2">
                     <h3 className="font-bold text-gray-900">Checkout</h3>
@@ -166,10 +166,11 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ items, onUpdateQuantit
                             <>
                                 <div className="grid grid-cols-2 gap-3">
                                     <Button
-                                        variant="outline"
+                                        variant="orange"
                                         onClick={() => onAction('quote')}
                                         disabled={items.length === 0}
-                                        className="w-full text-sm py-2.5 border-primary-200 text-primary-700 hover:bg-primary-50 font-bold"
+                                        className="w-full text-sm py-2.5 font-bold"
+                                        leftIcon={<FileText size={18} />}
                                     >
                                         Orçamento
                                     </Button>
@@ -178,14 +179,16 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ items, onUpdateQuantit
                                         onClick={() => onAction('schedule')}
                                         disabled={items.length === 0}
                                         className="w-full text-sm py-2.5 border-primary-200 text-primary-700 hover:bg-primary-50 font-bold"
+                                        leftIcon={<Calendar size={18} />}
                                     >
-                                        Agendar Serviço
+                                        Agendar
                                     </Button>
                                 </div>
                                 <Button
                                     onClick={() => onAction('startAttendance')}
                                     disabled={items.length === 0}
                                     className="w-full text-base py-3 shadow-lg shadow-primary-500/10 font-bold"
+                                    leftIcon={<Play size={20} className="fill-current" />}
                                 >
                                     Iniciar Atendimento
                                 </Button>
@@ -196,6 +199,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ items, onUpdateQuantit
                                     onClick={() => onAction('finalize')}
                                     disabled={!canFinalize || items.length === 0}
                                     className="col-span-1 disabled:opacity-50 font-bold shadow-md"
+                                    leftIcon={<CheckCircle size={18} />}
                                 >
                                     Finalizar
                                 </Button>
@@ -203,6 +207,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ items, onUpdateQuantit
                                     variant="ghost"
                                     onClick={() => onAction('cancel')}
                                     className="col-span-1 text-gray-500 hover:text-red-600 hover:bg-red-50 font-medium border border-gray-200"
+                                    leftIcon={<X size={18} />}
                                 >
                                     Cancelar
                                 </Button>
@@ -215,13 +220,15 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ items, onUpdateQuantit
                             onClick={() => onAction('schedule')}
                             disabled={items.length === 0}
                             className="col-span-1 disabled:opacity-50"
+                            leftIcon={<Calendar size={18} />}
                         >
                             Agendar
                         </Button>
                         <Button
-                            variant="outline"
+                            variant="orange"
                             onClick={() => onAction('quote')}
-                            className="col-span-1 border-primary-300 text-primary-600"
+                            className="col-span-1"
+                            leftIcon={<FileText size={18} />}
                         >
                             Orçamento
                         </Button>
