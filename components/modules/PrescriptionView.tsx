@@ -62,7 +62,7 @@ export const PrescriptionView: React.FC = () => {
                 <div className="w-full flex flex-col gap-6">
                     <div className="flex items-center justify-between">
                         <h3 className="font-bold text-gray-800 text-lg">Itens de Encaminhamento</h3>
-                        <span className="text-[10px] font-black bg-primary-600 text-white px-3 py-1 rounded-full uppercase tracking-widest shadow-lg shadow-primary-200 whitespace-nowrap">
+                        <span className="text-[10px] font-bold bg-primary-600 text-white px-3 py-1 rounded-full uppercase tracking-widest shadow-lg shadow-primary-200 whitespace-nowrap">
                             {attendance.prescriptions.length} ITEM(NS)
                         </span>
                     </div>
@@ -134,13 +134,13 @@ export const PrescriptionView: React.FC = () => {
                                             <div className="flex flex-col md:flex-row gap-6 relative z-10">
                                                 <div className="md:w-1/3">
                                                     <div className="flex items-center gap-2 mb-2">
-                                                        <h4 className="font-black text-gray-900 text-lg leading-tight">{item.name}</h4>
+                                                        <h4 className="font-bold text-gray-900 text-lg leading-tight">{item.name}</h4>
                                                     </div>
                                                 </div>
 
                                                 <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4">
                                                     <div className="space-y-1">
-                                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1">
+                                                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1">
                                                             <Scissors size={10} /> Posologia
                                                         </label>
                                                         <input
@@ -151,7 +151,7 @@ export const PrescriptionView: React.FC = () => {
                                                         />
                                                     </div>
                                                     <div className="space-y-1">
-                                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1">
+                                                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1">
                                                             <Clock size={10} /> Frequência
                                                         </label>
                                                         <input
@@ -162,7 +162,7 @@ export const PrescriptionView: React.FC = () => {
                                                         />
                                                     </div>
                                                     <div className="space-y-1">
-                                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1">
+                                                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1">
                                                             <Activity size={10} /> Duração
                                                         </label>
                                                         <input

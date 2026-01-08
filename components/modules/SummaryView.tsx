@@ -152,7 +152,7 @@ export const SummaryView: React.FC<SummaryViewProps> = ({ onFinish }) => {
                         {attendance.services.length > 0 && (
                             <div className="mt-6 pt-4 border-t border-gray-100 flex justify-between items-end">
                                 <span className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Total do Atendimento</span>
-                                <span className="text-2xl font-black text-emerald-600">{totalServices.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                                <span className="text-2xl font-bold text-emerald-600">{totalServices.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
                             </div>
                         )}
                     </div>

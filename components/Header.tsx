@@ -61,11 +61,11 @@ export const Header: React.FC<HeaderProps> = ({ onGoHome }) => {
             {isUserMenuOpen && (
               <div className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-[100]">
                 <div className="p-4 border-b border-gray-50 flex items-center gap-3 bg-gray-100/50">
-                  <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-black">
+                  <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold">
                     DV
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs font-black text-gray-900 uppercase">Dr. Veterinário</span>
+                    <span className="text-xs font-bold text-gray-900 uppercase">Dr. Veterinário</span>
                     <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Médico Veterinário</span>
                   </div>
                 </div>

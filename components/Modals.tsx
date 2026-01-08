@@ -255,7 +255,7 @@ export const FinalizeModal: React.FC<{
                 </div>
 
                 <div className="mb-8">
-                    <div className="flex justify-between text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">
+                    <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">
                         <span>Serviços contratados</span>
                         <span>Coparticipação</span>
                     </div>
@@ -272,12 +272,12 @@ export const FinalizeModal: React.FC<{
                                             {item.quantity > 1 ? `${item.quantity}x ` : ''}{item.name}
                                         </span>
                                         {hasAdditionalFees && (
-                                            <span className="text-[10px] text-primary-600 font-black uppercase tracking-tight mt-1 bg-primary-50 px-1.5 py-0.5 rounded w-fit">
+                                            <span className="text-[10px] text-primary-600 font-bold uppercase tracking-tight mt-1 bg-primary-50 px-1.5 py-0.5 rounded w-fit">
                                                 {item.anticipationFee ? 'Inclui Antecipação de Carência' : 'Inclui Compra de Limite'}
                                             </span>
                                         )}
                                     </div>
-                                    <span className="text-gray-900 font-black shrink-0">
+                                    <span className="text-gray-900 font-bold shrink-0">
                                         R$ {itemTotal.toFixed(2).replace('.', ',')}
                                     </span>
                                 </div>
@@ -287,7 +287,7 @@ export const FinalizeModal: React.FC<{
 
                     <div className="flex justify-between items-center text-xl font-bold bg-slate-900 text-white p-6 rounded-2xl shadow-xl shadow-slate-900/10">
                         <span className="text-slate-400 font-medium">Total</span>
-                        <span className="font-black text-2xl">R$ {grandTotal.toFixed(2).replace('.', ',')}</span>
+                        <span className="font-bold text-2xl">R$ {grandTotal.toFixed(2).replace('.', ',')}</span>
                     </div>
                 </div>
 
@@ -303,7 +303,7 @@ export const FinalizeModal: React.FC<{
                                 checked={paymentMethod === 'pix'}
                             />
                             <Check className={`shrink-0 ${paymentMethod === 'pix' ? 'text-primary-600 opacity-100' : 'opacity-0'}`} size={18} />
-                            <span className={`font-black uppercase tracking-widest text-[10px] ${paymentMethod === 'pix' ? 'text-primary-700' : 'text-gray-400'}`}>PIX</span>
+                            <span className={`font-bold uppercase tracking-widest text-[10px] ${paymentMethod === 'pix' ? 'text-primary-700' : 'text-gray-400'}`}>PIX</span>
                         </label>
                         <label className={`flex items-center justify-center gap-3 p-4 rounded-xl border-2 transition-all cursor-pointer ${paymentMethod === 'card' ? 'border-primary-600 bg-primary-50' : 'border-gray-100 bg-white hover:border-gray-200'}`}>
                             <input
@@ -314,7 +314,7 @@ export const FinalizeModal: React.FC<{
                                 checked={paymentMethod === 'card'}
                             />
                             <Check className={`shrink-0 ${paymentMethod === 'card' ? 'text-primary-600 opacity-100' : 'opacity-0'}`} size={18} />
-                            <span className={`font-black uppercase tracking-widest text-[10px] ${paymentMethod === 'card' ? 'text-primary-700' : 'text-gray-400'}`}>Cartão</span>
+                            <span className={`font-bold uppercase tracking-widest text-[10px] ${paymentMethod === 'card' ? 'text-primary-700' : 'text-gray-400'}`}>Cartão</span>
                         </label>
                     </div>
                 </div>
@@ -409,13 +409,13 @@ export const CancelAttendanceModal: React.FC<{
                     <button
                         onClick={handleConfirm}
                         disabled={isConfirmDisabled}
-                        className="w-full bg-primary-700 text-white font-black uppercase tracking-widest text-[10px] py-4 rounded-xl shadow-lg shadow-primary-900/10 hover:bg-primary-800 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                        className="w-full bg-primary-700 text-white font-bold uppercase tracking-widest text-[10px] py-4 rounded-xl shadow-lg shadow-primary-900/10 hover:bg-primary-800 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                     >
                         Cancelar atendimento
                     </button>
                     <button
                         onClick={onClose}
-                        className="w-full bg-white border-2 border-primary-100 text-primary-700 font-black uppercase tracking-widest text-[10px] py-4 rounded-xl hover:bg-primary-50 transition-all"
+                        className="w-full bg-white border-2 border-primary-100 text-primary-700 font-bold uppercase tracking-widest text-[10px] py-4 rounded-xl hover:bg-primary-50 transition-all"
                     >
                         Voltar
                     </button>
@@ -1121,7 +1121,7 @@ export const UpgradePlanModal: React.FC<{
                         </Button>
                         <Button
                             variant="outline"
-                            className="w-full h-10 text-[10px] border-green-500 text-green-600 hover:bg-green-50 font-black uppercase tracking-tighter flex items-center justify-center gap-1.5"
+                            className="w-full h-10 text-[10px] border-green-500 text-green-600 hover:bg-green-50 font-bold uppercase tracking-tighter flex items-center justify-center gap-1.5"
                             onClick={() => alert('Comparativo Super enviado via WhatsApp!')}
                         >
                             <MessageCircle size={14} className="shrink-0" />
@@ -1134,7 +1134,7 @@ export const UpgradePlanModal: React.FC<{
                         </Button>
                         <Button
                             variant="outline"
-                            className="w-full h-10 text-[10px] border-green-500 text-green-600 hover:bg-green-50 font-black uppercase tracking-tighter flex items-center justify-center gap-1.5"
+                            className="w-full h-10 text-[10px] border-green-500 text-green-600 hover:bg-green-50 font-bold uppercase tracking-tighter flex items-center justify-center gap-1.5"
                             onClick={() => alert('Comparativo Ultra enviado via WhatsApp!')}
                         >
                             <MessageCircle size={14} className="shrink-0" />

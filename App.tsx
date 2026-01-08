@@ -577,7 +577,7 @@ const App: React.FC = () => {
                             <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 ring-8 ring-red-50/50">
                                 <AlertTriangle size={32} className="text-status-error" />
                             </div>
-                            <h2 className="text-xl md:text-2xl font-black text-gray-900 mb-2">Plano Suspenso</h2>
+                            <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Plano Suspenso</h2>
                             <p className="text-sm md:text-base text-gray-500 mb-6 md:mb-8 leading-relaxed font-medium">
                                 Constam faturas em aberto para este tutor. Para prosseguir com o atendimento, é necessário regularizar as pendências.
                             </p>

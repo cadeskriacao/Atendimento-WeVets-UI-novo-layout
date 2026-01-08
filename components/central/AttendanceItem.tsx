@@ -105,14 +105,14 @@ export const AttendanceItem: React.FC<AttendanceItemProps> = ({
 
                                         {attendance.anamnesis.diagnosticHypothesis && (
                                             <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg">
-                                                <span className="block font-black text-[10px] text-blue-400 uppercase tracking-widest mb-1">Hipótese Diagnóstica</span>
+                                                <span className="block font-bold text-[10px] text-blue-400 uppercase tracking-widest mb-1">Hipótese Diagnóstica</span>
                                                 <p className="text-blue-900 font-bold text-xs">{attendance.anamnesis.diagnosticHypothesis}</p>
                                             </div>
                                         )}
 
                                         {attendance.prescriptions.length > 0 && (
                                             <div className="p-3 bg-purple-50 border border-purple-100 rounded-lg">
-                                                <span className="block font-black text-[10px] text-purple-400 uppercase tracking-widest mb-1">Encaminhamento</span>
+                                                <span className="block font-bold text-[10px] text-purple-400 uppercase tracking-widest mb-1">Encaminhamento</span>
                                                 <ul className="space-y-1">
                                                     {attendance.prescriptions.map(p => (
                                                         <li key={p.id} className="text-purple-900 text-xs font-bold flex items-center gap-2">

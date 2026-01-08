@@ -52,10 +52,10 @@ export const PetHeader: React.FC<PetHeaderProps> = ({
                     {/* Pet Avatar */}
                     <div className="flex-shrink-0">
                         {pet.image ? (
-                            <img src={pet.image} alt={pet.name} className="w-14 h-14 md:w-20 md:h-20 rounded-full object-cover border-2 border-white shadow-md ring-1 ring-gray-100" />
+                            <img src={pet.image} alt={pet.name} className="w-[68px] h-[68px] md:w-24 md:h-24 rounded-full object-cover border-2 border-white shadow-md ring-1 ring-gray-100" />
                         ) : (
-                            <div className="w-14 h-14 md:w-20 md:h-20 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 border-2 border-white shadow-md ring-1 ring-gray-100">
-                                <Cat size={24} className="md:w-10 md:h-10" />
+                            <div className="w-[68px] h-[68px] md:w-24 md:h-24 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 border-2 border-white shadow-md ring-1 ring-gray-100">
+                                <Cat size={29} className="md:w-12 md:h-12" />
                             </div>
                         )}
                     </div>
