@@ -12,7 +12,7 @@ interface SidebarItemProps {
 const SidebarItem: React.FC<SidebarItemProps> = ({ icon, label, onClick, isActive, isDestructive }) => (
     <button
         onClick={onClick}
-        className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold transition-all group ${isDestructive
+        className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-all group ${isDestructive
             ? 'text-status-error hover:bg-red-50 hover:text-red-700'
             : isActive
                 ? 'bg-primary-50 text-primary-700 shadow-sm ring-1 ring-primary-100/50'

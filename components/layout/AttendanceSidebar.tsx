@@ -62,7 +62,7 @@ export const AttendanceSidebar: React.FC<AttendanceSidebarProps> = ({ onCancel }
                         <button
                             key={step.id}
                             onClick={() => setCurrentStep(step.id)}
-                            className={`w-full flex items-center justify-between px-3 py-3 rounded-xl text-sm font-semibold transition-all group ${isActive
+                            className={`w-full flex items-center justify-between px-3 py-3 rounded-xl text-sm font-bold transition-all group ${isActive
                                 ? 'bg-primary-50 text-primary-700 shadow-sm ring-1 ring-primary-100/50'
                                 : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
                                 }`}

@@ -127,7 +127,7 @@ export const ServiceList: React.FC<ServiceListProps> = ({
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-[10px] font-mono text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded border border-gray-100">{service.code}</span>
-                  {service.name.startsWith(service.category) && <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">{service.category}</span>}
+                  {service.name.startsWith(service.category) && <span className="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">{service.category}</span>}
                 </div>
                 <h4 className="font-bold text-gray-900 text-lg leading-tight mb-2 group-hover:text-primary-700 transition-colors">
                   {service.name.replace(service.category, '').trim() || service.name}
@@ -168,16 +168,16 @@ export const ServiceList: React.FC<ServiceListProps> = ({
               {/* Actions */}
               <div className="flex items-center self-end md:self-center">
                 {service.actionType === 'forward' ? (
-                  <Button variant="outline" size="sm" onClick={() => onServiceForward && onServiceForward(service)} className="border-primary-200 text-primary-700 hover:bg-primary-50 font-semibold">
+                  <Button variant="outline" size="sm" onClick={() => onServiceForward && onServiceForward(service)} className="border-primary-200 text-primary-700 hover:bg-primary-50 font-bold">
                     Encaminhar
                   </Button>
                 ) : service.actionType === 'internal_only' ? (
-                  <Button variant="outline" size="sm" onClick={() => handleServiceClick(service)} className="border-amber-200 text-amber-700 hover:bg-amber-50 font-semibold gap-2">
+                  <Button variant="outline" size="sm" onClick={() => handleServiceClick(service)} className="border-amber-200 text-amber-700 hover:bg-amber-50 font-bold gap-2">
                     <AlertTriangle size={16} />
                     Inelegível
                   </Button>
                 ) : service.actionType === 'upgrade' ? (
-                  <Button variant="outline" size="sm" onClick={() => handleServiceClick(service)} className="border-primary-200 text-primary-700 hover:bg-primary-50 font-semibold">
+                  <Button variant="outline" size="sm" onClick={() => handleServiceClick(service)} className="border-primary-200 text-primary-700 hover:bg-primary-50 font-bold">
                     Ofertar Upgrade
                   </Button>
                 ) : service.actionType === 'none' ? (

@@ -86,8 +86,8 @@ export const SalesTable: React.FC<SalesTableProps> = ({ sales }) => {
                     <button
                         onClick={() => setFilterDate(prev => prev === 'THIS_MONTH' ? 'ALL' : 'THIS_MONTH')}
                         className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border transition-colors text-sm font-medium ${filterDate === 'THIS_MONTH'
-                                ? 'bg-primary-50 border-primary-100 text-primary-700'
-                                : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                            ? 'bg-primary-50 border-primary-100 text-primary-700'
+                            : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
                             }`}
                     >
                         <CalendarIcon size={16} />
@@ -105,12 +105,12 @@ export const SalesTable: React.FC<SalesTableProps> = ({ sales }) => {
                 <table className="w-full">
                     <thead>
                         <tr className="bg-gray-50/50 text-left border-b border-gray-100">
-                            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">ID / Data</th>
-                            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Cliente / Pet</th>
-                            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Valor Bruto</th>
-                            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Comissão WV</th>
-                            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Líquido</th>
+                            <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">ID / Data</th>
+                            <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Cliente / Pet</th>
+                            <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
+                            <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Valor Bruto</th>
+                            <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Comissão WV</th>
+                            <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Líquido</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">

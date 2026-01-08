@@ -38,7 +38,7 @@ export const AttendanceTabs: React.FC<AttendanceTabsProps> = () => {
                         <button
                             key={step.id}
                             onClick={() => setCurrentStep(step.id)}
-                            className={`flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 px-2 md:px-4 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-semibold transition-all whitespace-nowrap min-w-[70px] md:min-w-0 ${isActive
+                            className={`flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 px-2 md:px-4 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold transition-all whitespace-nowrap min-w-[70px] md:min-w-0 ${isActive
                                 ? 'bg-primary-50 text-primary-700 shadow-sm ring-1 ring-primary-100/50'
                                 : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 border border-transparent'
                                 }`}

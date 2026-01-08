@@ -98,7 +98,7 @@ export const AttendanceItem: React.FC<AttendanceItemProps> = ({
                                 ) : (
                                     <>
                                         {attendance.anamnesis.mainComplaint ? (
-                                            <p><span className="font-semibold text-gray-800">Queixa:</span> {attendance.anamnesis.mainComplaint}</p>
+                                            <p><span className="font-bold text-gray-800">Queixa:</span> {attendance.anamnesis.mainComplaint}</p>
                                         ) : (
                                             <p className="text-gray-400 italic">Nenhuma queixa registrada</p>
                                         )}

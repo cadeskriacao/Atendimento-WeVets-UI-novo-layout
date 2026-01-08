@@ -108,7 +108,7 @@ export const SummaryView: React.FC<SummaryViewProps> = ({ onFinish }) => {
                                     {attendance.services.map(item => (
                                         <li key={item.id} className="flex flex-col py-3 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 rounded-lg px-2 -mx-2 transition-colors">
                                             <div className="flex justify-between items-start mb-1">
-                                                <span className="font-semibold text-gray-800">{item.name}</span>
+                                                <span className="font-bold text-gray-800">{item.name}</span>
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-[10px] font-bold text-gray-400 bg-white border px-1.5 rounded uppercase tracking-wider">x{item.quantity}</span>
                                                     <span className="font-bold text-gray-900">

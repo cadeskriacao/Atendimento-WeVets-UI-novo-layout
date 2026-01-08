@@ -168,9 +168,9 @@ export const ConfirmBudgetModal: React.FC<{
                 <table className="w-full text-sm text-left border-collapse">
                     <thead className="text-xs text-gray-500 uppercase bg-gray-50 sticky top-0">
                         <tr>
-                            <th className="px-3 py-3 font-semibold rounded-tl-lg rounded-bl-lg">Serviço</th>
-                            <th className="px-3 py-3 font-semibold text-center">Qtd</th>
-                            <th className="px-3 py-3 font-semibold text-right rounded-tr-lg rounded-br-lg">Total</th>
+                            <th className="px-3 py-3 font-bold rounded-tl-lg rounded-bl-lg">Serviço</th>
+                            <th className="px-3 py-3 font-bold text-center">Qtd</th>
+                            <th className="px-3 py-3 font-bold text-right rounded-tr-lg rounded-br-lg">Total</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -1277,7 +1277,7 @@ export const AttendanceHistoryModal: React.FC<AttendanceHistoryModalProps> = ({ 
                                             <div className="mb-6 pb-4 border-b border-gray-50 bg-gray-100/50 -mx-6 px-6 py-4 flex items-center gap-2">
                                                 <div className="w-1.5 h-1.5 rounded-full bg-primary-400"></div>
                                                 <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">
-                                                    Paciente: <span className="text-gray-700 ml-1 normal-case text-sm font-semibold">{pet?.name} • {pet?.breed} • {pet?.age} • {pet?.gender}</span>
+                                                    Paciente: <span className="text-gray-700 ml-1 normal-case text-sm font-bold">{pet?.name} • {pet?.breed} • {pet?.age} • {pet?.gender}</span>
                                                 </p>
                                             </div>
 

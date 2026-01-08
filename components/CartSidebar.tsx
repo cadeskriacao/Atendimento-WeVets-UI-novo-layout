@@ -26,12 +26,17 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ items, onUpdateQuantit
 
     if (items.length === 0 && isAttendanceMode && !isInProgress) {
         return (
-            <div className={`bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 flex flex-col items-center justify-center text-center h-64 transition-all hover:shadow-[0_8px_40px_rgb(0,0,0,0.06)] ${className}`}>
-                <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
-                    <ShoppingCart size={32} className="text-slate-300" />
+            <div className={className}>
+                <div className="flex items-center gap-2 mb-3 px-1">
+                    <h3 className="font-bold text-gray-900 text-lg">Orçamento</h3>
                 </div>
-                <p className="text-sm font-bold text-slate-800">O carrinho está vazio</p>
-                <p className="text-xs text-slate-400 mt-2 max-w-[180px]">Adicione serviços da lista ao lado para começar o faturamento</p>
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 flex flex-col items-center justify-center text-center h-64 transition-all hover:shadow-[0_8px_40px_rgb(0,0,0,0.06)]">
+                    <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                        <ShoppingCart size={32} className="text-slate-300" />
+                    </div>
+                    <p className="text-sm font-bold text-slate-800">O carrinho está vazio</p>
+                    <p className="text-xs text-slate-400 mt-2 max-w-[180px]">Adicione serviços da lista ao lado para começar o faturamento</p>
+                </div>
             </div>
         );
     }
@@ -164,7 +169,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ items, onUpdateQuantit
                                         variant="outline"
                                         onClick={() => onAction('quote')}
                                         disabled={items.length === 0}
-                                        className="w-full text-sm py-2.5 border-primary-200 text-primary-700 hover:bg-primary-50 font-semibold"
+                                        className="w-full text-sm py-2.5 border-primary-200 text-primary-700 hover:bg-primary-50 font-bold"
                                     >
                                         Orçamento
                                     </Button>
@@ -172,7 +177,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ items, onUpdateQuantit
                                         variant="outline"
                                         onClick={() => onAction('schedule')}
                                         disabled={items.length === 0}
-                                        className="w-full text-sm py-2.5 border-primary-200 text-primary-700 hover:bg-primary-50 font-semibold"
+                                        className="w-full text-sm py-2.5 border-primary-200 text-primary-700 hover:bg-primary-50 font-bold"
                                     >
                                         Agendar Serviço
                                     </Button>
