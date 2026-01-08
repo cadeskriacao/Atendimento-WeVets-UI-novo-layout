@@ -14,7 +14,6 @@ export const AttendanceTabs: React.FC<AttendanceTabsProps> = () => {
         { id: 'SERVICES', label: 'Serviços', icon: <ShoppingCart size={18} /> },
         { id: 'ANAMNESIS', label: 'Anamnese', icon: <FileText size={18} /> },
         { id: 'PRESCRIPTION', label: 'Encaminhamento', icon: <FileText size={18} /> },
-        { id: 'SUMMARY', label: 'Resumo', icon: <CheckCircle size={18} /> },
     ];
 
     const getStatusIcon = (stepId: AttendanceStep) => {
@@ -23,7 +22,6 @@ export const AttendanceTabs: React.FC<AttendanceTabsProps> = () => {
         if (stepId === 'ANAMNESIS' && (attendance.anamnesis.mainComplaint.length > 0 || attendance.anamnesis.vitals.weight)) return <CheckCircle size={14} className="text-status-success" />;
         if (stepId === 'SERVICES' && attendance.services.length > 0) return <CheckCircle size={14} className="text-status-success" />;
         if (stepId === 'PRESCRIPTION' && attendance.prescriptions.length > 0) return <CheckCircle size={14} className="text-status-success" />;
-        if (stepId === 'SUMMARY' && attendance.status === 'FINISHED') return <CheckCircle size={14} className="text-status-success" />;
 
         return <Circle size={14} className="text-gray-300" />;
     };

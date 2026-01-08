@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Calendar as CalendarIcon, Clock, Cat, ShoppingCart, Trash2, Upload, Printer, Info, CheckCircle2, AlertTriangle, Check, ChevronDown, ChevronUp, FileText, MessageCircle } from 'lucide-react';
+import { X, Calendar as CalendarIcon, Clock, Cat, ShoppingCart, Trash2, Upload, Printer, Info, CheckCircle2, AlertTriangle, Check, ChevronDown, ChevronUp, FileText, MessageCircle, Eye, HeartPulse, Paperclip } from 'lucide-react';
 import { Attendance, CartItem, ModalType, Pet, Service, Tutor } from '../types';
 import { MOCK_BUDGET_ITEMS, MOCK_ATTENDANCE_HISTORY } from '../constants';
 import { Button, Input, Select, Badge, Card } from './ui';
@@ -236,8 +236,14 @@ export const FinalizeModal: React.FC<{
     isAttendanceMode?: boolean;
     isFeesPaid?: boolean;
     onCancelProcess?: () => void;
-}> = ({ items, onClose, onConfirm, isAttendanceMode = false, isFeesPaid = false, onCancelProcess }) => {
+    attendance: Attendance | null;
+    referrals?: any[]; // Using any to be safe with App.tsx extensions for now, or use PrescriptionItem[]
+}> = ({ items, onClose, onConfirm, isAttendanceMode = false, isFeesPaid = false, onCancelProcess, attendance, referrals }) => {
     const [paymentMethod, setPaymentMethod] = useState<'pix' | 'card' | null>(null);
+    const [previewAttachment, setPreviewAttachment] = useState<string | null>(null);
+
+    // Use passed referrals or fallback to attendance prescriptions
+    const activeReferrals = referrals || attendance?.prescriptions || [];
 
     // Calcular totais
     const grandTotal = items.reduce((sum, item) => {
@@ -246,96 +252,266 @@ export const FinalizeModal: React.FC<{
     }, 0);
 
     return (
-        <Modal isOpen={true} onClose={onClose} title="Finalizar atendimento">
-            <div className="p-6 pt-2">
-                <div className="text-gray-600 mb-8 text-sm">
-                    <p className="mb-1"><span className="text-gray-900 font-bold">Dia 14/01/2026 às 14:30</span></p>
-                    <p className="mb-1 text-gray-500">WeVets - Unidade Jardins (aqui)</p>
-                    <p className="text-gray-500">Rua Augusta, 1234 - Jardins, São Paulo - SP</p>
+        <Modal isOpen={true} onClose={onClose} title="Finalizar atendimento" maxWidth="max-w-6xl">
+            <div className="p-6 pt-2 h-full max-h-[85vh] flex flex-col">
+                <div className="bg-blue-50/50 -mx-6 -mt-2 px-6 py-3 mb-6 border-b border-blue-100 flex justify-between items-center text-sm md:text-base shrink-0">
+                    <div>
+                        <span className="text-gray-900 font-bold mr-2">WeVets - Unidade Jardins</span>
+                        <span className="text-gray-500">Rua Augusta, 1234 - Jardins, SP</span>
+                    </div>
+                    <span className="text-gray-900 font-bold bg-white px-3 py-1 rounded-full text-xs border border-blue-100 shadow-sm">14/01/2026 às 14:30</span>
                 </div>
 
-                <div className="mb-8">
-                    <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">
-                        <span>Serviços contratados</span>
-                        <span>Coparticipação</span>
-                    </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 min-h-0 flex-1">
+                    {/* Left Column: Clinical Summary */}
+                    <div className="space-y-6 overflow-y-auto pr-4 lg:pr-10 lg:border-r lg:border-gray-100 custom-scrollbar max-h-full">
+                        <div className="flex items-center gap-2 mb-4 pb-2 border-b border-gray-100 text-amber-600 sticky top-0 bg-white z-10 pt-1">
+                            <div className="p-1.5 rounded-lg bg-amber-50">
+                                <FileText size={18} className="text-amber-600" />
+                            </div>
+                            <h3 className="font-bold text-gray-800 text-base">Resumo Clínico</h3>
+                        </div>
 
-                    <div className="space-y-5 mb-6 max-h-[35vh] overflow-y-auto pr-2 custom-scrollbar">
-                        {items.map(item => {
-                            const itemTotal = (item.copay + (item.anticipationFee || 0) + (item.limitFee || 0)) * item.quantity;
-                            const hasAdditionalFees = (item.anticipationFee || 0) > 0 || (item.limitFee || 0) > 0;
-
-                            return (
-                                <div key={item.id} className="flex justify-between text-sm items-start border-b border-gray-50 pb-3 last:border-0 last:pb-0">
-                                    <div className="flex flex-col">
-                                        <span className="text-gray-900 font-bold leading-tight">
-                                            {item.quantity > 1 ? `${item.quantity}x ` : ''}{item.name}
-                                        </span>
-                                        {hasAdditionalFees && (
-                                            <span className="text-[10px] text-primary-600 font-bold uppercase tracking-tight mt-1 bg-primary-50 px-1.5 py-0.5 rounded w-fit">
-                                                {item.anticipationFee ? 'Inclui Antecipação de Carência' : 'Inclui Compra de Limite'}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <span className="text-gray-900 font-bold shrink-0">
-                                        R$ {itemTotal.toFixed(2).replace('.', ',')}
-                                    </span>
+                        {attendance ? (
+                            <div className="space-y-6">
+                                <div>
+                                    <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1.5 flex items-center gap-2">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                                        Queixa Principal
+                                    </label>
+                                    <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed font-medium">
+                                        {attendance.anamnesis.mainComplaint || <span className="text-gray-400 italic font-normal">Nenhuma queixa registrada.</span>}
+                                    </p>
                                 </div>
-                            );
-                        })}
+
+                                {attendance.anamnesis.diagnosticHypothesis && (
+                                    <div className="border-t border-gray-100 pt-4">
+                                        <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1.5 font-[800]">Hipótese Diagnóstica</label>
+                                        <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed font-medium">
+                                            {attendance.anamnesis.diagnosticHypothesis}
+                                        </p>
+                                    </div>
+                                )}
+
+                                {attendance.anamnesis.attachments && attendance.anamnesis.attachments.length > 0 && (
+                                    <div className="border-t border-gray-100 pt-4">
+                                        <label className="text-[10px] uppercase font-bold text-gray-400 block mb-2">Anexos</label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {attendance.anamnesis.attachments.map((fileEntry, idx) => {
+                                                const [fileName] = fileEntry.includes('|data:') ? fileEntry.split('|') : [fileEntry];
+                                                return (
+                                                    <div key={idx} className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-2.5 py-1.5 shadow-sm group hover:border-primary-200 transition-colors">
+                                                        <Paperclip size={12} className="text-gray-400" />
+                                                        <span className="text-[11px] font-medium text-gray-600 max-w-[150px] truncate">{fileName}</span>
+                                                        <button
+                                                            onClick={() => setPreviewAttachment(fileEntry)}
+                                                            className="p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-primary-600 transition-colors"
+                                                            title="Visualizar"
+                                                        >
+                                                            <Eye size={12} />
+                                                        </button>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeReferrals && activeReferrals.length > 0 && (
+                                    <div className="border-t border-gray-100 pt-4">
+                                        <label className="text-[10px] uppercase font-bold text-gray-400 block mb-3">Encaminhamentos e Prescrições</label>
+                                        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                                            <table className="w-full text-left border-collapse">
+                                                <thead>
+                                                    <tr className="bg-gray-50 border-b border-gray-100">
+                                                        <th className="px-4 py-2 text-[10px] uppercase font-bold text-gray-400">Item</th>
+                                                        <th className="px-4 py-2 text-[10px] uppercase font-bold text-gray-400">Posologia</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {activeReferrals.map((ref, idx) => {
+                                                        const posologiaParts = [];
+                                                        if (ref.dosage && ref.dosage !== '-') posologiaParts.push(ref.dosage);
+                                                        if (ref.frequency && ref.frequency !== '-') posologiaParts.push(ref.frequency);
+                                                        if (ref.duration && ref.duration !== '-') posologiaParts.push(ref.duration);
+
+                                                        const posologiaStr = posologiaParts.join(', ');
+
+                                                        return (
+                                                            <tr key={idx} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
+                                                                <td className="px-4 py-3 text-xs font-bold text-gray-700 whitespace-nowrap">{ref.name}</td>
+                                                                <td className="px-4 py-3 text-xs text-gray-500 leading-relaxed italic">
+                                                                    {posologiaStr || ref.instructions || ref.notes || '-'}
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    })}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="p-8 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                                <p className="text-sm text-gray-400">Nenhum dado clínico disponível.</p>
+                            </div>
+                        )}
                     </div>
 
-                    <div className="flex justify-between items-center text-xl font-bold bg-slate-900 text-white p-6 rounded-2xl shadow-xl shadow-slate-900/10">
-                        <span className="text-slate-400 font-medium">Total</span>
-                        <span className="font-bold text-2xl">R$ {grandTotal.toFixed(2).replace('.', ',')}</span>
-                    </div>
-                </div>
+                    {/* Right Column: Financial & Payment */}
+                    <div className="space-y-6 flex flex-col h-full">
+                        <div className="flex items-center gap-2 mb-4 pb-2 border-b border-gray-100 text-emerald-600">
+                            <div className="p-1.5 rounded-lg bg-emerald-50">
+                                <ShoppingCart size={18} className="text-emerald-600" />
+                            </div>
+                            <h3 className="font-bold text-gray-800 text-base">Faturamento e Pagamento</h3>
+                        </div>
 
-                <div className="mb-8 p-1">
-                    <p className="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wider opacity-60">Forma de pagamento recebida</p>
-                    <div className="grid grid-cols-2 gap-4">
-                        <label className={`flex items-center justify-center gap-3 p-4 rounded-xl border-2 transition-all cursor-pointer ${paymentMethod === 'pix' ? 'border-primary-600 bg-primary-50' : 'border-gray-100 bg-white hover:border-gray-200'}`}>
-                            <input
-                                type="radio"
-                                name="payment"
-                                className="hidden"
-                                onChange={() => setPaymentMethod('pix')}
-                                checked={paymentMethod === 'pix'}
-                            />
-                            <Check className={`shrink-0 ${paymentMethod === 'pix' ? 'text-primary-600 opacity-100' : 'opacity-0'}`} size={18} />
-                            <span className={`font-bold uppercase tracking-widest text-[10px] ${paymentMethod === 'pix' ? 'text-primary-700' : 'text-gray-400'}`}>PIX</span>
-                        </label>
-                        <label className={`flex items-center justify-center gap-3 p-4 rounded-xl border-2 transition-all cursor-pointer ${paymentMethod === 'card' ? 'border-primary-600 bg-primary-50' : 'border-gray-100 bg-white hover:border-gray-200'}`}>
-                            <input
-                                type="radio"
-                                name="payment"
-                                className="hidden"
-                                onChange={() => setPaymentMethod('card')}
-                                checked={paymentMethod === 'card'}
-                            />
-                            <Check className={`shrink-0 ${paymentMethod === 'card' ? 'text-primary-600 opacity-100' : 'opacity-0'}`} size={18} />
-                            <span className={`font-bold uppercase tracking-widest text-[10px] ${paymentMethod === 'card' ? 'text-primary-700' : 'text-gray-400'}`}>Cartão</span>
-                        </label>
-                    </div>
-                </div>
+                        <div className="flex-1 overflow-hidden flex flex-col min-h-0 mb-6">
+                            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm flex flex-col min-h-0">
+                                <div className="overflow-y-auto custom-scrollbar">
+                                    <table className="w-full text-left border-collapse">
+                                        <thead>
+                                            <tr className="bg-gray-50 border-b border-gray-100 sticky top-0 z-10">
+                                                <th className="px-4 py-2 text-[10px] uppercase font-bold text-gray-400">Serviço</th>
+                                                <th className="px-4 py-2 text-[10px] uppercase font-bold text-gray-400 text-right">Valor</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {items.map(item => {
+                                                const itemTotal = (item.copay + (item.anticipationFee || 0) + (item.limitFee || 0)) * item.quantity;
+                                                const hasAdditionalFees = (item.anticipationFee || 0) > 0 || (item.limitFee || 0) > 0;
 
-                <div className="flex flex-col-reverse sm:flex-row gap-3">
-                    <button
-                        onClick={onCancelProcess || onClose}
-                        className="w-full sm:flex-1 bg-white border-2 border-primary-100 text-primary-700 font-bold uppercase tracking-widest text-xs py-4 rounded-xl hover:bg-primary-50 transition-all font-sans"
-                    >
-                        Cancelar
-                    </button>
-                    <button
-                        onClick={onConfirm || onClose}
-                        disabled={!paymentMethod}
-                        className="w-full sm:flex-[2] bg-primary-700 text-white font-bold uppercase tracking-widest text-xs py-4 rounded-xl hover:bg-primary-800 transition-all shadow-lg shadow-primary-900/10 disabled:opacity-30 disabled:cursor-not-allowed font-sans"
-                    >
-                        Finalizar atendimento
-                    </button>
+                                                return (
+                                                    <tr key={item.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
+                                                        <td className="px-4 py-3 min-w-0">
+                                                            <div className="flex flex-col">
+                                                                <span className="text-xs font-bold text-gray-700 break-words flex gap-2 items-start">
+                                                                    {item.quantity > 1 && <span className="text-gray-400 font-normal text-[10px] bg-gray-100 px-1 rounded whitespace-nowrap mt-0.5">x{item.quantity}</span>}
+                                                                    {item.name}
+                                                                </span>
+                                                                {hasAdditionalFees && (
+                                                                    <span className="text-[9px] text-emerald-600 font-bold uppercase tracking-tight mt-1 bg-emerald-50 px-1.5 py-0.5 rounded w-fit">
+                                                                        {item.anticipationFee ? 'Inclui Antecipação' : 'Inclui Limite'}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-4 py-3 text-xs font-bold text-gray-900 text-right whitespace-nowrap align-top">
+                                                            R$ {itemTotal.toFixed(2).replace('.', ',')}
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-between items-center py-4 border-t border-b border-gray-100 mb-8">
+                            <span className="text-gray-500 font-bold text-sm uppercase tracking-wider">Total Final</span>
+                            <span className="font-extrabold text-xl text-gray-900">R$ {grandTotal.toFixed(2).replace('.', ',')}</span>
+                        </div>
+
+                        <div className="mt-auto">
+                            <p className="font-bold text-gray-900 mb-3 text-xs uppercase tracking-wider opacity-60">Forma de pagamento</p>
+                            <div className="grid grid-cols-2 gap-3 mb-6">
+                                <label className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all cursor-pointer relative overflow-hidden ${paymentMethod === 'pix' ? 'border-emerald-500 bg-emerald-50/50' : 'border-gray-200 bg-white hover:border-gray-300'}`}>
+                                    <input
+                                        type="radio"
+                                        name="payment"
+                                        className="hidden"
+                                        onChange={() => setPaymentMethod('pix')}
+                                        checked={paymentMethod === 'pix'}
+                                    />
+                                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${paymentMethod === 'pix' ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-gray-300'}`}>
+                                        {paymentMethod === 'pix' && <Check size={10} />}
+                                    </div>
+                                    <span className={`font-bold text-sm ${paymentMethod === 'pix' ? 'text-emerald-700' : 'text-gray-600'}`}>PIX</span>
+                                </label>
+                                <label className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all cursor-pointer relative overflow-hidden ${paymentMethod === 'card' ? 'border-primary-500 bg-primary-50/50' : 'border-gray-200 bg-white hover:border-gray-300'}`}>
+                                    <input
+                                        type="radio"
+                                        name="payment"
+                                        className="hidden"
+                                        onChange={() => setPaymentMethod('card')}
+                                        checked={paymentMethod === 'card'}
+                                    />
+                                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${paymentMethod === 'card' ? 'border-primary-500 bg-primary-500 text-white' : 'border-gray-300'}`}>
+                                        {paymentMethod === 'card' && <Check size={10} />}
+                                    </div>
+                                    <span className={`font-bold text-sm ${paymentMethod === 'card' ? 'text-primary-700' : 'text-gray-600'}`}>Cartão</span>
+                                </label>
+                            </div>
+
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={onCancelProcess || onClose}
+                                    className="flex-1 bg-white border border-gray-200 text-gray-600 font-bold uppercase tracking-widest text-xs py-3.5 rounded-xl hover:bg-gray-50 hover:text-gray-800 transition-all"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={onConfirm || onClose}
+                                    disabled={!paymentMethod}
+                                    className="flex-[2] bg-emerald-600 text-white font-bold uppercase tracking-widest text-xs py-3.5 rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center gap-2"
+                                >
+                                    <CheckCircle2 size={16} />
+                                    Finalizar Atendimento
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </Modal>
+
+            {/* Preview Modal for Finalize Screen */}
+            {
+                previewAttachment && (
+                    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+                        <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+                            <div className="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50">
+                                <h3 className="font-bold text-gray-800 truncate pr-4">
+                                    {previewAttachment.includes('|data:') ? previewAttachment.split('|')[0] : previewAttachment}
+                                </h3>
+                                <button
+                                    onClick={() => setPreviewAttachment(null)}
+                                    className="p-2 hover:bg-gray-200 rounded-full text-gray-500 transition-colors"
+                                >
+                                    <X size={20} />
+                                </button>
+                            </div>
+                            <div className="flex-1 overflow-auto p-4 bg-gray-100 flex items-center justify-center">
+                                {(() => {
+                                    const isDataUrl = previewAttachment.includes('|data:');
+                                    const [fileName, fileUrl] = isDataUrl ? previewAttachment.split('|') : [previewAttachment, null];
+                                    const isImage = (fileName.match(/\.(jpg|jpeg|png|gif|webp)$/i) || fileUrl?.startsWith('data:image'));
+
+                                    if (isImage) {
+                                        return (
+                                            <img
+                                                src={fileUrl || "/placeholder-image.jpg"}
+                                                alt={fileName}
+                                                className="max-w-full max-h-full object-contain rounded shadow-sm"
+                                            />
+                                        );
+                                    }
+
+                                    return (
+                                        <div className="flex flex-col items-center justify-center text-gray-400 gap-4 py-12">
+                                            <FileText size={48} />
+                                            <p className="text-sm font-medium">Visualização não disponível para este formato</p>
+                                        </div>
+                                    );
+                                })()}
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+        </Modal >
     );
 };
 

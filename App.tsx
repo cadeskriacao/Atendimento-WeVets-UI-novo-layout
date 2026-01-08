@@ -35,7 +35,7 @@ import { mockTutorService } from './services/tutor/MockTutorService'; // Import 
 import { SalesDashboard } from './components/sales/SalesDashboard';
 
 const App: React.FC = () => {
-    const { attendance, startAttendance, cancelAttendance, finishAttendance, setServices: setContextServices, updateTriage, scheduleAttendance, recordBudgetGeneration, setCurrentStep, canFinalize, startMedicalAttendance } = useAttendance();
+    const { attendance, startAttendance, cancelAttendance, finishAttendance, setServices: setContextServices, updateTriage, scheduleAttendance, recordBudgetGeneration, setCurrentStep, canFinalize, startMedicalAttendance, addPrescription } = useAttendance();
 
     const [view, setView] = useState<'search' | 'dashboard' | 'planSelection' | 'sales'>('search');
     const [activePet, setActivePet] = useState<Pet | null>(null);
@@ -286,7 +286,16 @@ const App: React.FC = () => {
         else if (type === 'internalOnly') setActiveModal('internalOnlyDetails');
     };
 
-    const handleServiceForward = (service: Service) => setShowForwardToast(true);
+    const handleServiceForward = (service: Service) => {
+        addPrescription({
+            name: service.name,
+            dosage: '-',
+            frequency: '-',
+            duration: '-',
+            notes: 'Encaminhamento Interno/Externo'
+        });
+        setShowForwardToast(true);
+    };
     const handleSimulateGracePayment = () => {
         if (selectedServiceForCheck) {
             setUnlockedServices(prev => [...prev, selectedServiceForCheck.id]);
@@ -702,7 +711,7 @@ const App: React.FC = () => {
 
 
             {/* Modals */}
-            {activeModal === 'finalize' && <FinalizeModal items={cartItems} onClose={() => setActiveModal('none')} onConfirm={handleAttendanceFinish} isAttendanceMode={isClinicalMode} isFeesPaid={isFinalizeFeesPaid} onCancelProcess={() => setActiveModal('none')} />}
+            {activeModal === 'finalize' && <FinalizeModal items={cartItems} onClose={() => setActiveModal('none')} onConfirm={handleAttendanceFinish} isAttendanceMode={isClinicalMode} isFeesPaid={isFinalizeFeesPaid} onCancelProcess={() => setActiveModal('none')} attendance={attendance} />}
             {activeModal === 'cancelAttendance' && attendance && <CancelAttendanceModal attendance={attendance} onClose={() => setActiveModal('none')} onConfirm={handleConfirmCancellation} />}
             {activeModal === 'schedule' && <ScheduleModal onClose={() => setActiveModal('none')} onConfirm={(data) => {
                 if (isClinicalMode) {
