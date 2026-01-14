@@ -643,21 +643,30 @@ const App: React.FC = () => {
                 onOpenCart={() => setIsMobileCartOpen(true)}
             />
 
-            {/* Mobile Cart Drawer */}
+            {/* Mobile Cart Bottom Sheet */}
             {isMobileCartOpen && (
-                <div className="fixed inset-0 z-[70] lg:hidden">
-                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onClick={() => setIsMobileCartOpen(false)} />
-                    <div className="absolute right-0 top-0 bottom-0 w-[90%] max-w-[350px] bg-white shadow-2xl animate-in slide-in-from-right duration-300 flex flex-col">
-                        <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-gray-50/50">
-                            <h3 className="font-bold text-lg text-gray-800">Seu Carrinho</h3>
+                <div className="fixed inset-0 z-[70] lg:hidden flex flex-col justify-end">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setIsMobileCartOpen(false)} />
+                    <div className="relative bg-white shadow-2xl animate-in slide-in-from-bottom duration-300 flex flex-col rounded-t-[32px] max-h-[90vh] overflow-hidden">
+                        {/* Drag Handle */}
+                        <div className="w-full flex justify-center pt-3 pb-1" onClick={() => setIsMobileCartOpen(false)}>
+                            <div className="w-12 h-1.5 bg-gray-200 rounded-full" />
+                        </div>
+
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                            <div>
+                                <h3 className="font-bold text-xl text-gray-900 leading-tight">Seu Carrinho</h3>
+                                <p className="text-xs text-gray-500 font-medium">Revise e finalize seus serviços</p>
+                            </div>
                             <button
                                 onClick={() => setIsMobileCartOpen(false)}
-                                className="p-2 bg-white border border-gray-200 rounded-full text-gray-500 hover:bg-gray-100 transition-colors"
+                                className="w-10 h-10 flex items-center justify-center bg-gray-50 border border-gray-100 rounded-full text-gray-400 hover:text-gray-600 transition-colors"
                             >
                                 <X size={20} />
                             </button>
                         </div>
-                        <div className="flex-1 overflow-hidden p-3 bg-gray-50/30">
+
+                        <div className="flex-1 overflow-hidden p-4 bg-white">
                             <CartSidebar
                                 items={cartItems}
                                 onUpdateQuantity={updateQuantity}
@@ -670,44 +679,14 @@ const App: React.FC = () => {
                                 isScheduled={attendance?.status === 'SCHEDULED'}
                                 isInProgress={attendance?.status === 'IN_PROGRESS'}
                                 canFinalize={canFinalize}
-                                className="max-h-full border-0 shadow-none bg-transparent"
+                                className="h-full border-0 shadow-none bg-transparent"
                             />
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Delinquency Overlay */}
-            {isDelinquent && !isPlanReactivated && (
-                <div className="absolute inset-0 z-50 flex items-start justify-center pt-24 pointer-events-auto">
-                    <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-lg w-full text-center border border-red-100 mx-4 animate-in fade-in zoom-in duration-300">
-                        <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <AlertTriangle size={40} className="text-red-500" />
-                        </div>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-3">Plano Suspenso</h2>
-                        <p className="text-gray-500 mb-8 leading-relaxed">
-                            Constam faturas em aberto para este tutor. Para prosseguir com o atendimento, é necessário regularizar as pendências.
-                        </p>
-                        <div className="space-y-3">
-                            <Button
-                                onClick={() => {
-                                    alert('Link de pagamento enviado!');
-                                }}
-                                variant="outline"
-                                className="w-full border-red-200 text-red-600 hover:bg-red-50"
-                            >
-                                Enviar Link de Pagamento
-                            </Button>
-                            <Button
-                                onClick={handleSimulatePayment}
-                                className="w-full bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-200"
-                            >
-                                Simular Pagamento Realizado
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            )}
+
 
 
             {/* Modals */}
